@@ -3877,8 +3877,4 @@
       [showReorientationTab]="selectedRole() === 'recruiter'"
       (closeModal)="showJobSearch.set(false)"
     ></app-job-search-modal>
-    }
-  `,
-  host: { '(document:click)': 'onDocumentClick($event)' },
-  styles: [],
-})
+}

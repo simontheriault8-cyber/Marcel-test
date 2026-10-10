@@ -42,13 +42,20 @@ jobs:
 
       - name: Préparer les fichiers SPA et nojekyll
         run: |
-          cp dist/index.html dist/404.html
-          touch dist/.nojekyll
+          if [ -d "dist/browser" ]; then
+            DEPLOY_FOLDER="dist/browser"
+          else
+            DEPLOY_FOLDER="dist"
+          fi
+          echo "Dossier de build détecté : $DEPLOY_FOLDER"
+          cp "$DEPLOY_FOLDER/index.html" "$DEPLOY_FOLDER/404.html"
+          touch "$DEPLOY_FOLDER/.nojekyll"
+          echo "DEPLOY_FOLDER=$DEPLOY_FOLDER" >> $GITHUB_ENV
 
       - name: Déploiement sur la branche gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist
+          folder: ${{ env.DEPLOY_FOLDER }}
           branch: gh-pages
           clean-exclude: |
             pr-preview
@@ -80,14 +87,20 @@ jobs:
       - name: Préparer les fichiers SPA et nojekyll
         if: github.event.action != 'closed'
         run: |
-          cp dist/index.html dist/404.html
-          touch dist/.nojekyll
+          if [ -d "dist/browser" ]; then
+            PREVIEW_FOLDER="dist/browser"
+          else
+            PREVIEW_FOLDER="dist"
+          fi
+          echo "Dossier de preview détecté : $PREVIEW_FOLDER"
+          cp "$PREVIEW_FOLDER/index.html" "$PREVIEW_FOLDER/404.html"
+          touch "$PREVIEW_FOLDER/.nojekyll"
+          echo "PREVIEW_FOLDER=$PREVIEW_FOLDER" >> $GITHUB_ENV
 
       - name: Déployer ou supprimer la preview sur GitHub Pages
         uses: rossjrw/pr-preview-action@v1
         with:
-          source-dir: ./dist/
+          source-dir: ${{ env.PREVIEW_FOLDER }}
           preview-branch: gh-pages
           umbrella-dir: pr-preview
           token: ${{ secrets.GITHUB_TOKEN }}
-

@@ -1,6 +1,6 @@
 {
-  "name": " Marcel-2.0",
-  "description": "Imported from GitHub: simontheriault8-cyber/Marcel-2.0",
+  "name": "Marcel 2.0",
+  "description": "Programme d'aide à la vérification des dossiers de recrutement et génération de courriels pour les Forces armées canadiennes.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

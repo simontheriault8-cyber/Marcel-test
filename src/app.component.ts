@@ -25,7 +25,6 @@ import { JobSearchModalComponent } from "./app/components/job-search-modal.compo
 import { CalendarPickerComponent } from "./app/components/calendar-picker.component";
 import { CourseSeriesPickerComponent } from "./app/components/course-series-picker.component";
 import { UnitPickerComponent } from "./app/components/unit-picker.component";
-import { TutoMarcelComponent } from "./app/components/tuto-marcel.component";
 import { RoleSelectionComponent } from "./app/components/role-selection.component";
 import { SignatureManagerComponent } from "./app/components/signature-manager.component";
 import { AuthGateComponent } from "./app/components/auth-gate.component";
@@ -201,8 +200,9 @@ function getTodayDateString(): string {
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [CommonModule, JobSearchModalComponent, CalendarPickerComponent, CourseSeriesPickerComponent, UnitPickerComponent, TutoMarcelComponent, FormsModule, RoleSelectionComponent, SignatureManagerComponent, AuthGateComponent],
+  imports: [CommonModule, JobSearchModalComponent, CalendarPickerComponent, CourseSeriesPickerComponent, UnitPickerComponent, FormsModule, RoleSelectionComponent, SignatureManagerComponent, AuthGateComponent],
   templateUrl: './app.component.html',
+  host: { '(document:click)': 'onDocumentClick($event)' },
 })
 export class AppComponent implements OnInit {
   onAuthenticated() {

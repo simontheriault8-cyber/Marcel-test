@@ -146,12 +146,26 @@ export class SharedStateService {
       : DEFAULT_SIG_OTA_EN
   );
 
+  // Signal aliases for compatibility with signature manager
+  customSigFr = this.customSignatureFr;
+  customSigEn = this.customSignatureEn;
+  customSigOtaFr = this.customSignatureOtaFr;
+  customSigOtaEn = this.customSignatureOtaEn;
+
   getSignatureFr(isOta = this.isOtaDossier()): string {
     return isOta ? this.customSignatureOtaFr() : this.customSignatureFr();
   }
 
   getSignatureEn(isOta = this.isOtaDossier()): string {
     return isOta ? this.customSignatureOtaEn() : this.customSignatureEn();
+  }
+
+  getSignatureOtaFr(): string {
+    return this.customSignatureOtaFr();
+  }
+
+  getSignatureOtaEn(): string {
+    return this.customSignatureOtaEn();
   }
 
   getHtmlSignatureFr(isOta = this.isOtaDossier()): string {
@@ -209,6 +223,21 @@ export class SharedStateService {
       this.customSignatureOtaEn.set(otaEn);
       localStorage.setItem("custom_signature_ota_en", otaEn);
     }
+  }
+
+  saveCustomSignatures(fr: string, en: string) {
+    this.saveSignatures(fr, en);
+  }
+
+  saveCustomOtaSignatures(otaFr: string, otaEn: string) {
+    this.customSignatureOtaFr.set(otaFr);
+    this.customSignatureOtaEn.set(otaEn);
+    localStorage.setItem("custom_signature_ota_fr", otaFr);
+    localStorage.setItem("custom_signature_ota_en", otaEn);
+  }
+
+  resetToDefault(type: 'all' | 'normal' | 'ota' = 'all') {
+    this.resetSignatures(type);
   }
 
   resetSignatures(type: 'all' | 'normal' | 'ota' = 'all') {
