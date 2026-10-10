@@ -1,0 +1,994 @@
+<div class="flex flex-col xl:flex-row gap-6">
+              <!-- Scolarité -->
+            <div
+              class="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1"
+            >
+              <div class="bg-slate-50 border-b border-slate-200 shrink-0">
+                <div class="p-4 pb-0">
+                  <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <h3 class="text-lg font-bold text-slate-800">
+                      Scolarité
+                    </h3>
+                    <div class="flex flex-col items-start gap-1.5 text-sm font-medium text-slate-700">
+                      <label class="inline-flex items-center gap-2 cursor-pointer select-none hover:text-slate-900">
+                        <input
+                          type="checkbox"
+                          [checked]="selectedCriteriaIds().has('etude_anglais')"
+                          (change)="toggleManualCriterion('etude_anglais')"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span>Étude en anglais</span>
+                      </label>
+                      <label class="inline-flex items-center gap-2 cursor-pointer select-none hover:text-slate-900">
+                        <input
+                          type="checkbox"
+                          [checked]="selectedCriteriaIds().has('etude_hors_canada')"
+                          (change)="toggleManualCriterion('etude_hors_canada')"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span>Étude hors Canada</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="flex gap-1 overflow-x-auto scolarite-tabs">
+                    <button
+                      (click)="activeScolariteTab.set('secondaire')"
+                      [class.border-blue-600]="
+                        activeScolariteTab() === 'secondaire'
+                      "
+                      [class.text-blue-600]="
+                        activeScolariteTab() === 'secondaire'
+                      "
+                      [class.border-transparent]="
+                        activeScolariteTab() !== 'secondaire'
+                      "
+                      [class.text-slate-500]="
+                        activeScolariteTab() !== 'secondaire'
+                      "
+                      class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors hover:text-blue-600 hover:bg-slate-100/50 rounded-t-lg"
+                    >
+                      Secondaire
+                    </button>
+                    <button
+                      (click)="activeScolariteTab.set('specialises')"
+                      [class.border-blue-600]="
+                        activeScolariteTab() === 'specialises'
+                      "
+                      [class.text-blue-600]="
+                        activeScolariteTab() === 'specialises'
+                      "
+                      [class.border-transparent]="
+                        activeScolariteTab() !== 'specialises'
+                      "
+                      [class.text-slate-500]="
+                        activeScolariteTab() !== 'specialises'
+                      "
+                      class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors hover:text-blue-600 hover:bg-slate-100/50 rounded-t-lg"
+                    >
+                      Cours spécialisés
+                    </button>
+                    <button
+                      (click)="activeScolariteTab.set('universitaire')"
+                      [class.border-blue-600]="
+                        activeScolariteTab() === 'universitaire'
+                      "
+                      [class.text-blue-600]="
+                        activeScolariteTab() === 'universitaire'
+                      "
+                      [class.border-transparent]="
+                        activeScolariteTab() !== 'universitaire'
+                      "
+                      [class.text-slate-500]="
+                        activeScolariteTab() !== 'universitaire'
+                      "
+                      class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors hover:text-blue-600 hover:bg-slate-100/50 rounded-t-lg"
+                    >
+                      Universitaire
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4">
+                <!-- TAB SECONDAIRE -->
+                <div
+                  *ngIf="activeScolariteTab() === 'secondaire'"
+                  class="flex flex-col gap-2"
+                >
+                  <!-- Année scolaire -->
+                  <div>
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Année scolaire
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaAnneeScolaire()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Histoire -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Histoire
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaHistoire()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Langue -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Langue
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaLangue()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Mathématique -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <div class="flex justify-between items-center mb-2 px-3">
+                      <h4
+                        class="text-sm font-semibold text-slate-500 uppercase tracking-wider"
+                      >
+                        Mathématique
+                      </h4>
+                      <select
+                        [ngModel]="selectedProvince()"
+                        (ngModelChange)="selectedProvince.set($event)"
+                        class="px-2 py-1 border border-slate-300 bg-white rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-[150px] truncate cursor-pointer"
+                      >
+                        <option *ngFor="let p of PROVINCES" [value]="p.id">
+                          {{ p.name }}
+                        </option>
+                      </select>
+                    </div>
+                    <label
+                      *ngFor="let m of mathCoursesForProvince()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(m.id)"
+                        (change)="toggleManualCriterion(m.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ m.label }}</span
+                      >
+                    </label>
+                    <div
+                      *ngIf="mathCoursesForProvince().length === 0"
+                      class="text-sm text-slate-500 italic p-2"
+                    >
+                      Aucun cours de mathématiques défini pour cette province.
+                    </div>
+                  </div>
+
+                  <!-- Science -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Science
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaScience()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Informatique -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Informatique
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaInformatique()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+                </div>
+
+                <!-- TAB COURS SPÉCIALISÉS -->
+                <div
+                  *ngIf="activeScolariteTab() === 'specialises'"
+                  class="flex flex-col gap-2"
+                >
+                  <h4
+                    class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                  >
+                    Cours post-secondaire (non universitaire)
+                  </h4>
+                  <label
+                    *ngFor="let crit of criteriaCoursSpecialise()"
+                    class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="selectedCriteriaIds().has(crit.id)"
+                      (change)="toggleManualCriterion(crit.id)"
+                      class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span
+                      class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                      >{{ crit.label }}</span
+                    >
+                  </label>
+                  <div
+                    *ngIf="criteriaCoursSpecialise().length === 0"
+                    class="text-sm text-slate-500 italic p-2"
+                  >
+                    Aucun critère défini.
+                  </div>
+                </div>
+
+                <!-- TAB UNIVERSITAIRE -->
+                <div
+                  *ngIf="activeScolariteTab() === 'universitaire'"
+                  class="flex flex-col gap-2"
+                >
+                  <!-- Premier cycle -->
+                  <div>
+                    <label
+                      class="flex items-center gap-2 px-3 mb-2 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="
+                          selectedCriteriaIds().has('univ_1er_cycle_global')
+                        "
+                        (change)="
+                          toggleManualCriterion('univ_1er_cycle_global')
+                        "
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <h4
+                        class="text-sm font-semibold text-slate-500 uppercase tracking-wider group-hover:text-slate-700"
+                      >
+                        Étude de premier cycle
+                      </h4>
+                    </label>
+
+                    <div class="ml-2 mb-2 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('genie')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="expandedDomaines().has('genie')"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has('univ_1er_cycle_genie')
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_1er_cycle_genie')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Domaine du Génie
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('genie')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaire1erCycleGenie()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="ml-2 mb-2 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('sciences')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="
+                              expandedDomaines().has('sciences')
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has(
+                                'univ_1er_cycle_sciences'
+                              )
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_1er_cycle_sciences')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Domaine des Sciences
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('sciences')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaire1erCycleSciences()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="ml-2 mb-2 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('arts')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="expandedDomaines().has('arts')"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has('univ_1er_cycle_arts')
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_1er_cycle_arts')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Domaine des Arts
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('arts')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaire1erCycleArts()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="ml-2 mb-4 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('sante')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="expandedDomaines().has('sante')"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has('univ_1er_cycle_sante')
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_1er_cycle_sante')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Domaine de la Santé
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('sante')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaire1erCycleSante()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div
+                      *ngIf="criteriaUniversitaire1erCycle().length === 0"
+                      class="text-sm text-slate-500 italic p-3 text-center border border-dashed border-slate-200 rounded-lg"
+                    >
+                      Aucun critère défini pour le moment.
+                    </div>
+                  </div>
+
+                  <!-- Cycle supérieur -->
+                  <div class="mt-4 pt-4 border-t border-slate-100">
+                    <label
+                      class="flex items-center gap-2 px-3 mb-2 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="
+                          selectedCriteriaIds().has('univ_cycle_sup_global')
+                        "
+                        (change)="
+                          toggleManualCriterion('univ_cycle_sup_global')
+                        "
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <h4
+                        class="text-sm font-semibold text-slate-500 uppercase tracking-wider group-hover:text-slate-700"
+                      >
+                        Étude de cycles supérieurs
+                      </h4>
+                    </label>
+
+                    <div class="ml-2 mb-2 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('maitrise')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="
+                              expandedDomaines().has('maitrise')
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has(
+                                'univ_cycle_sup_maitrise'
+                              )
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_cycle_sup_maitrise')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Maîtrise
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('maitrise')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaireCycleSuperieurMaitrise()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="ml-2 mb-4 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('doctorat')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="
+                              expandedDomaines().has('doctorat')
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has(
+                                'univ_cycle_sup_doctorat'
+                              )
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_cycle_sup_doctorat')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Doctorat
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('doctorat')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaireCycleSuperieurDoctorat()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div
+                      *ngIf="criteriaUniversitaireCycleSuperieur().length === 0"
+                      class="text-sm text-slate-500 italic p-3 text-center border border-dashed border-slate-200 rounded-lg"
+                    >
+                      Aucun critère défini pour le moment.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expérience -->
+            <div
+              class="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1"
+            >
+              <div class="bg-slate-50 border-b border-slate-200 shrink-0">
+                <div class="p-4 pb-0">
+                  <h3 class="text-lg font-bold text-slate-800 mb-3">
+                    Expérience
+                  </h3>
+                </div>
+              </div>
+              <div class="p-4">
+                <!-- Section Test supplémentaire si au moins un métier au dossier requiert un test -->
+                @if (hasAnyExtraTest()) {
+                  <div class="mb-4 p-3 bg-indigo-50/80 border border-indigo-200 rounded-xl space-y-2.5">
+                    <div class="flex items-center justify-between pb-1.5 border-b border-indigo-100">
+                      <div class="flex items-center gap-2">
+                        <span class="p-0.5 px-1.5 rounded bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                          Test
+                        </span>
+                        <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wide">
+                          Test supplémentaire
+                        </h4>
+                      </div>
+                      <span class="text-[11px] text-indigo-700 font-medium">
+                        Cocher = Réussi
+                      </span>
+                    </div>
+
+                    <div class="space-y-2">
+                      <!-- Test ECE (00203) -->
+                      @if (hasEceJob()) {
+                        <div class="p-2.5 bg-white border border-indigo-100 rounded-lg shadow-2xs">
+                          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              [checked]="testEcePassed()"
+                              (change)="testEcePassed.set($any($event.target).checked)"
+                              class="mt-0.5 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <div class="flex-1">
+                              <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800">ECE</span>
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [class.bg-emerald-100]="testEcePassed()" [class.text-emerald-800]="testEcePassed()" [class.bg-slate-100]="!testEcePassed()" [class.text-slate-600]="!testEcePassed()">
+                                  {{ testEcePassed() ? "Réussi (Admissible)" : "Non coché (Inadmissible)" }}
+                                </span>
+                              </div>
+                              <p class="text-[11px] text-slate-500 mt-0.5">
+                                Évaluation des compétences en communication écrite (00203 - Officier des affaires publiques)
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      }
+
+                      <!-- Test ESOM (00207) -->
+                      @if (hasEsomJob()) {
+                        <div class="p-2.5 bg-white border border-indigo-100 rounded-lg shadow-2xs">
+                          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              [checked]="testEsomPassed()"
+                              (change)="testEsomPassed.set($any($event.target).checked)"
+                              class="mt-0.5 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <div class="flex-1">
+                              <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800">ESOM</span>
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [class.bg-emerald-100]="testEsomPassed()" [class.text-emerald-800]="testEsomPassed()" [class.bg-slate-100]="!testEsomPassed()" [class.text-slate-600]="!testEsomPassed()">
+                                  {{ testEsomPassed() ? "Réussi (Admissible)" : "Non coché (Inadmissible)" }}
+                                </span>
+                              </div>
+                              <p class="text-[11px] text-slate-500 mt-0.5">
+                                Évaluation de sélection des officiers de marine (00207 - Officier de guerre navale)
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      }
+
+                      <!-- Test CEOPM (00214) -->
+                      @if (hasCeopmJob()) {
+                        <div class="p-2.5 bg-white border border-indigo-100 rounded-lg shadow-2xs">
+                          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              [checked]="testCeopmPassed()"
+                              (change)="testCeopmPassed.set($any($event.target).checked)"
+                              class="mt-0.5 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <div class="flex-1">
+                              <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800">CEOPM</span>
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [class.bg-emerald-100]="testCeopmPassed()" [class.text-emerald-800]="testCeopmPassed()" [class.bg-slate-100]="!testCeopmPassed()" [class.text-slate-600]="!testCeopmPassed()">
+                                  {{ testCeopmPassed() ? "Réussi (Admissible)" : "Non coché (Inadmissible)" }}
+                                </span>
+                              </div>
+                              <p class="text-[11px] text-slate-500 mt-0.5">
+                                Centre d’évaluation des officiers de la police militaire (00214 - Officier de la police militaire)
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      }
+
+                      <!-- Test CSPN (00182, 00183, 00184) -->
+                      @if (hasCspnJob()) {
+                        <div class="p-2.5 bg-white border border-indigo-100 rounded-lg shadow-2xs space-y-2">
+                          <div class="flex flex-wrap items-start justify-between gap-2">
+                            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                [checked]="testCspnPassed()"
+                                (change)="onCspnMainToggle($any($event.target).checked)"
+                                class="mt-0.5 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                              />
+                              <div>
+                                <div class="flex items-center gap-2">
+                                  <span class="text-xs font-bold text-slate-800">CSPN</span>
+                                  <span
+                                    class="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+                                    [class.bg-emerald-100]="testCspnPassed()"
+                                    [class.text-emerald-800]="testCspnPassed()"
+                                    [class.bg-amber-100]="testCspnNotCompleted()"
+                                    [class.text-amber-800]="testCspnNotCompleted()"
+                                    [class.bg-slate-100]="!testCspnPassed() && !testCspnNotCompleted()"
+                                    [class.text-slate-600]="!testCspnPassed() && !testCspnNotCompleted()"
+                                  >
+                                    {{ testCspnPassed() ? "Test réussi" : (testCspnNotCompleted() ? "Pas encore complété (Inadmissible)" : "Non coché (Inadmissible)") }}
+                                  </span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5">
+                                  Centre de sélection du personnel navigant (00182, 00183, 00184)
+                                </p>
+                              </div>
+                            </label>
+
+                            <label class="inline-flex items-center gap-1.5 px-2 py-1 bg-amber-50/90 border border-amber-200 rounded-md cursor-pointer hover:bg-amber-100/80 select-none transition-colors">
+                              <input
+                                type="checkbox"
+                                [checked]="testCspnNotCompleted()"
+                                (change)="onCspnNotCompletedToggle($any($event.target).checked)"
+                                class="w-3.5 h-3.5 text-amber-600 border-amber-300 rounded focus:ring-amber-500 cursor-pointer"
+                              />
+                              <span class="text-xs font-medium text-amber-900">Pas encore complété</span>
+                            </label>
+                          </div>
+
+                          @if (testCspnPassed()) {
+                            <div class="mt-2 pl-6 pt-2 border-t border-slate-100 space-y-1.5">
+                              <p class="text-[11px] font-semibold text-slate-700 mb-1">
+                                Métiers pour lesquels le test est réussi :
+                              </p>
+                              <div class="grid grid-cols-1 gap-1.5">
+                                <label class="flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-50 cursor-pointer border border-slate-100 select-none">
+                                  <input
+                                    type="checkbox"
+                                    [checked]="testCspn00182Passed()"
+                                    (change)="testCspn00182Passed.set($any($event.target).checked)"
+                                    class="w-3.5 h-3.5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                                  />
+                                  <span class="text-xs text-slate-800">
+                                    <span class="font-bold text-indigo-700">00182</span> - SYSTÈMES DE COMBAT
+                                  </span>
+                                </label>
+
+                                <label class="flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-50 cursor-pointer border border-slate-100 select-none">
+                                  <input
+                                    type="checkbox"
+                                    [checked]="testCspn00183Passed()"
+                                    (change)="testCspn00183Passed.set($any($event.target).checked)"
+                                    class="w-3.5 h-3.5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                                  />
+                                  <span class="text-xs text-slate-800">
+                                    <span class="font-bold text-indigo-700">00183</span> - PILOTE
+                                  </span>
+                                </label>
+
+                                <label class="flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-50 cursor-pointer border border-slate-100 select-none">
+                                  <input
+                                    type="checkbox"
+                                    [checked]="testCspn00184Passed()"
+                                    (change)="testCspn00184Passed.set($any($event.target).checked)"
+                                    class="w-3.5 h-3.5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                                  />
+                                  <span class="text-xs text-slate-800">
+                                    <span class="font-bold text-indigo-700">00184</span> - CONTRÔLE AÉROSPATIAL
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <div class="flex flex-col gap-2">
+                  <label
+                    *ngFor="let crit of criteriaExperience()"
+                    class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="selectedCriteriaIds().has(crit.id)"
+                      (change)="toggleManualCriterion(crit.id)"
+                      class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span
+                      class="text-sm text-slate-700 group-hover:text-slate-900 font-medium whitespace-pre-line"
+                      >{{ crit.label }}</span
+                    >
+                  </label>
+                  <div
+                    *ngIf="criteriaExperience().length === 0"
+                    class="text-sm text-slate-500 italic p-3 text-center border border-dashed border-slate-200 rounded-lg"
+                  >
+                    Aucune expérience définie.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+    </div>
+  `,
+})

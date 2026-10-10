@@ -1,0 +1,867 @@
+<div
+      #modalContainer
+      class="fixed bg-white rounded-lg shadow-2xl border border-slate-300 flex flex-col overflow-hidden transition-all duration-75"
+      [class.inset-0]="isFullScreen()"
+      [class.z-50]="true"
+      [style.left.px]="isFullScreen() ? 0 : position().x"
+      [style.top.px]="isFullScreen() ? 0 : position().y"
+      [style.width]="isFullScreen() ? '100%' : size().width + 'px'"
+      [style.height]="isFullScreen() ? '100%' : size().height + 'px'"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Recherche de métiers"
+    >
+      <!-- Header (Draggable) -->
+      <div
+        class="bg-slate-800 text-white p-3 flex justify-between items-center cursor-move select-none shrink-0"
+        (mousedown)="startDrag($event)"
+      >
+        <div class="font-bold flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            @if (selectedJob() && activeTab() === "catalogue") {
+              <button
+                (click)="clearSelection()"
+                class="hover:bg-slate-700 p-1 rounded-full transition-colors mr-1"
+                (mousedown)="$event.stopPropagation()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+              <span class="truncate max-w-[300px]">{{
+                selectedJob()?.title
+              }}</span>
+            } @else {
+              <span class="bg-indigo-600 text-white text-[11px] font-black px-1.5 py-0.5 rounded tracking-wider leading-none">RÉO</span>
+              <span class="hidden sm:inline">Portail Carrière</span>
+            }
+          </div>
+
+          <!-- Tabs -->
+          <div
+            class="hidden sm:flex bg-slate-900 rounded-lg p-1 gap-1"
+            (mousedown)="$event.stopPropagation()"
+          >
+            @if (_showReorientationTab()) {
+              <button
+                (click)="setTab('reorientation')"
+                class="px-3 py-1 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                [class.bg-slate-700]="activeTab() === 'reorientation'"
+                [class.text-white]="activeTab() === 'reorientation'"
+                [class.text-slate-400]="activeTab() !== 'reorientation'"
+                [class.hover:text-white]="activeTab() !== 'reorientation'"
+              >
+                Réorientation
+              </button>
+              <button
+                (click)="setTab('pfor')"
+                class="px-3 py-1 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                [class.bg-slate-700]="activeTab() === 'pfor'"
+                [class.text-white]="activeTab() === 'pfor'"
+                [class.text-slate-400]="activeTab() !== 'pfor'"
+                [class.hover:text-white]="activeTab() !== 'pfor'"
+              >
+                PFOR
+              </button>
+            }
+            <button
+              (click)="activeTab.set('catalogue')"
+              class="px-3 py-1 rounded-md text-sm font-medium transition-colors cursor-pointer"
+              [class.bg-slate-700]="activeTab() === 'catalogue'"
+              [class.text-white]="activeTab() === 'catalogue'"
+              [class.text-slate-400]="activeTab() !== 'catalogue'"
+              [class.hover:text-white]="activeTab() !== 'catalogue'"
+            >
+              Catalogue
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center gap-2"
+          (mousedown)="$event.stopPropagation()"
+        >
+          <!-- Full Screen Toggle -->
+          <button
+            (click)="toggleFullScreen()"
+            class="p-1 hover:bg-slate-700 rounded transition-colors"
+            aria-label="Basculer en plein écran"
+          >
+            <svg
+              *ngIf="!isFullScreen()"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+              />
+            </svg>
+            <svg
+              *ngIf="isFullScreen()"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 9V4m0 5H4m5 0l-5-5M15 15v5m0-5h5m-5 0l5 5M15 9V4m0 5h5m-5 0l5-5M9 15v5m0-5H4m5 0l-5 5"
+              />
+            </svg>
+          </button>
+          <!-- Close -->
+          <button
+            (click)="close()"
+            class="p-1 hover:bg-red-600 rounded transition-colors"
+            aria-label="Fermer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Tabs (visible only on small screens) -->
+      <div class="sm:hidden bg-slate-800 p-2 flex gap-1.5 shrink-0 flex-wrap">
+        @if (_showReorientationTab()) {
+          <button
+            (click)="setTab('reorientation')"
+            class="flex-1 min-w-[70px] px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors"
+            [class.bg-slate-700]="activeTab() === 'reorientation'"
+            [class.text-white]="activeTab() === 'reorientation'"
+            [class.text-slate-400]="activeTab() !== 'reorientation'"
+          >
+            Réorientation
+          </button>
+          <button
+            (click)="setTab('pfor')"
+            class="flex-1 min-w-[70px] px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors"
+            [class.bg-slate-700]="activeTab() === 'pfor'"
+            [class.text-white]="activeTab() === 'pfor'"
+            [class.text-slate-400]="activeTab() !== 'pfor'"
+          >
+            PFOR
+          </button>
+        }
+        <button
+          (click)="activeTab.set('catalogue')"
+          class="flex-1 min-w-[60px] px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors"
+          [class.bg-slate-700]="activeTab() === 'catalogue'"
+          [class.text-white]="activeTab() === 'catalogue'"
+          [class.text-slate-400]="activeTab() !== 'catalogue'"
+        >
+          Catalogue
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div
+        class="flex-1 flex flex-col overflow-hidden relative bg-white min-h-0"
+      >
+        <!-- TAB 1: CATALOGUE -->
+        <div
+          [class.hidden]="activeTab() !== 'catalogue'"
+          class="flex-1 overflow-hidden relative flex flex-col w-full h-full"
+        >
+          @if (selectedJob(); as job) {
+            <!-- DETAIL VIEW -->
+            <div class="flex-1 overflow-y-auto p-6 min-h-0">
+              <div class="mb-6 border-b border-slate-200 pb-4">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">
+                  {{ job.title }}
+                </h2>
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold border border-indigo-200"
+                    >ID: {{ job.id }}</span
+                  >
+                  <span
+                    class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-sm font-semibold border border-slate-200"
+                    >{{ job.abbreviation }}</span
+                  >
+
+                  <!-- Pastille Officier / MR -->
+                  @if (isOfficerJob(job.id)) {
+                    <span
+                      class="bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-bold border border-purple-200 flex items-center gap-1 shadow-sm"
+                      title="Officier"
+                    >
+                      Officier (Off)
+                    </span>
+                  } @else {
+                    <span
+                      class="bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-xs font-bold border border-orange-200 flex items-center gap-1 shadow-sm"
+                      title="Militaire du rang"
+                    >
+                      Militaire du rang (MR)
+                    </span>
+                  }
+
+                  <!-- Pastille Élément -->
+                  @if (job.element) {
+                    <span
+                      class="px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1 shadow-sm"
+                      [class.bg-amber-50]="job.element === 'CMP'"
+                      [class.text-amber-800]="job.element === 'CMP'"
+                      [class.border-amber-200]="job.element === 'CMP'"
+                      [class.bg-emerald-50]="job.element === 'Armée'"
+                      [class.text-emerald-800]="job.element === 'Armée'"
+                      [class.border-emerald-200]="job.element === 'Armée'"
+                      [class.bg-sky-50]="job.element === 'Air'"
+                      [class.text-sky-800]="job.element === 'Air'"
+                      [class.border-sky-200]="job.element === 'Air'"
+                      [class.bg-indigo-50]="job.element === 'Marine'"
+                      [class.text-indigo-800]="job.element === 'Marine'"
+                      [class.border-indigo-200]="job.element === 'Marine'"
+                    >
+                      Élément : {{ job.element === 'CMP' ? 'CMP (Choix du postulant)' : job.element }}
+                    </span>
+                  }
+
+                  <!-- Pastilles CC et RP -->
+                  @if (isJobRp(job.id)) {
+                    <span
+                      class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200 flex items-center gap-1 shadow-sm"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                      Citoyen canadien (CC)
+                    </span>
+                    <span
+                      class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200 flex items-center gap-1 shadow-sm"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                      Résident permanent (RP)
+                    </span>
+                  } @else {
+                    <span
+                      class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200 flex items-center gap-1 shadow-sm"
+                      title="Admissible aux citoyens canadiens uniquement"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                      Citoyen canadien uniquement (CC)
+                    </span>
+                  }
+
+
+                  <!-- Pastilles Programmes d'entrée (Ouvert / Fermé SIP) -->
+                  @let programs = jobService.getJobPrograms(job.id);
+                  @for (prog of getObjectKeys(programs); track prog) {
+                    <span
+                      class="px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 shadow-sm"
+                      [class.bg-emerald-50]="programs[prog] === 'o'"
+                      [class.text-emerald-800]="programs[prog] === 'o'"
+                      [class.border-emerald-200]="programs[prog] === 'o'"
+                      [class.bg-amber-50]="programs[prog] === 'limité'"
+                      [class.text-amber-800]="programs[prog] === 'limité'"
+                      [class.border-amber-200]="programs[prog] === 'limité'"
+                      [class.bg-rose-50]="programs[prog] === 'f'"
+                      [class.text-rose-800]="programs[prog] === 'f'"
+                      [class.border-rose-200]="programs[prog] === 'f'"
+                    >
+                      <span
+                        class="w-2 h-2 rounded-full"
+                        [class.bg-emerald-500]="programs[prog] === 'o'"
+                        [class.bg-amber-500]="programs[prog] === 'limité'"
+                        [class.bg-rose-500]="programs[prog] === 'f'"
+                      ></span>
+                      {{ prog }} : {{ programs[prog] === 'o' ? 'Ouvert' : programs[prog] === 'limité' ? 'Limité' : 'Fermé' }}
+                    </span>
+                  }
+                  @if (getObjectKeys(programs).length === 0) {
+                    <span
+                      class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full text-xs font-semibold border border-slate-200 shadow-sm"
+                    >
+                      SIP : N/A
+                    </span>
+                  }
+                  @if (job.contracts) {
+                    @for (contract of job.contracts; track contract.program) {
+                      <span
+                        class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold border border-emerald-200"
+                        title="{{ contract.program }}"
+                      >
+                        Contrat initial: {{ contract.duration }}
+                        @if (contract.program !== "Enrôlement direct") {
+                          ({{ contract.program }})
+                        }
+                      </span>
+                    }
+                  }
+                </div>
+              </div>
+
+              <!-- MEDICAL PROFILE SECTION -->
+              @if (job.medicalStandard) {
+                <div class="mb-6">
+                  <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">
+                    Profil médical minimal requis
+                  </h3>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="inline-flex flex-col items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1 shadow-sm">
+                      <span class="text-xs text-slate-500 font-bold">V</span>
+                      <span class="text-base font-bold text-slate-800">{{ job.medicalStandard.v }}</span>
+                    </span>
+                    <span class="inline-flex flex-col items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1 shadow-sm">
+                      <span class="text-xs text-slate-500 font-bold">CV</span>
+                      <span class="text-base font-bold text-slate-800">{{ job.medicalStandard.cv }}</span>
+                    </span>
+                    <span class="inline-flex flex-col items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1 shadow-sm">
+                      <span class="text-xs text-slate-500 font-bold">H</span>
+                      <span class="text-base font-bold text-slate-800">{{ job.medicalStandard.h }}</span>
+                    </span>
+                    <span class="inline-flex flex-col items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1 shadow-sm">
+                      <span class="text-xs text-slate-500 font-bold">G</span>
+                      <span class="text-base font-bold text-slate-800">{{ job.medicalStandard.g }}</span>
+                    </span>
+                    <span class="inline-flex flex-col items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1 shadow-sm">
+                      <span class="text-xs text-slate-500 font-bold">O</span>
+                      <span class="text-base font-bold text-slate-800">{{ job.medicalStandard.o }}</span>
+                    </span>
+                    <span class="inline-flex flex-col items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1 shadow-sm">
+                      <span class="text-xs text-slate-500 font-bold">A</span>
+                      <span class="text-base font-bold text-slate-800">{{ job.medicalStandard.a }}</span>
+                    </span>
+                    <span class="inline-flex flex-col items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1 shadow-sm">
+                      <span class="text-xs text-slate-500 font-bold">U</span>
+                      <span class="text-base font-bold text-slate-800">{{ job.medicalStandard.u }}</span>
+                    </span>
+                  </div>
+                </div>
+              }
+
+              <div class="prose prose-slate max-w-none">
+                @if (job.details) {
+                  <!-- STRUCTURED TABLE VIEW -->
+                  @for (detail of job.details; track $index) {
+                    <div class="mb-8">
+                      <h3
+                        class="text-lg font-bold text-slate-900 underline mb-4"
+                      >
+                        {{ detail.force }}
+                      </h3>
+
+                      <div
+                        class="overflow-x-auto border border-slate-300 rounded-lg shadow-sm"
+                      >
+                        <table class="w-full text-sm text-left border-collapse">
+                          <thead
+                            class="bg-slate-200 text-slate-800 uppercase font-bold"
+                          >
+                            <tr>
+                              <th class="p-3 border border-slate-300 w-1/4">
+                                CANDIDATS
+                              </th>
+                              <th class="p-3 border border-slate-300 w-1/2">
+                                SCOLARITÉ
+                              </th>
+                              <th class="p-3 border border-slate-300 w-1/4">
+                                EXPÉRIENCE
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (
+                              group of detail.candidateGroups;
+                              track $index
+                            ) {
+                              @for (
+                                req of group.requirements;
+                                track $index;
+                                let first = $first
+                              ) {
+                                <tr class="bg-white hover:bg-slate-50">
+                                  @if (first) {
+                                    <td
+                                      [attr.rowspan]="group.requirements.length"
+                                      class="p-3 border border-slate-300 font-semibold align-top bg-slate-50"
+                                    >
+                                      <ul
+                                        class="list-disc list-outside ml-4 space-y-1"
+                                      >
+                                        @for (
+                                          candidate of expandList(
+                                            group.candidates
+                                          );
+                                          track $index
+                                        ) {
+                                          <li
+                                            [class.list-none]="
+                                              isBulletless(candidate)
+                                            "
+                                            [style.list-style-type]="
+                                              isSubItem(candidate)
+                                                ? 'circle'
+                                                : ''
+                                            "
+                                            [class.-ml-4]="
+                                              isConnector(candidate) ||
+                                              isParenthetical(candidate)
+                                            "
+                                            [class.font-bold]="
+                                              isConnector(candidate)
+                                            "
+                                            [class.text-center]="
+                                              isConnector(candidate)
+                                            "
+                                            [class.ml-6]="isSubItem(candidate)"
+                                            [class.text-sm]="
+                                              isParenthetical(candidate)
+                                            "
+                                            [class.text-slate-500]="
+                                              isParenthetical(candidate)
+                                            "
+                                            [class.mt-2]="
+                                              isParenthetical(candidate)
+                                            "
+                                          >
+                                            <span
+                                              [innerHTML]="
+                                                formatTextWithNotes(
+                                                  isSubItem(candidate)
+                                                    ? cleanSubItem(candidate)
+                                                    : candidate
+                                                )
+                                              "
+                                            ></span>
+                                          </li>
+                                        }
+                                      </ul>
+                                    </td>
+                                  }
+                                  <td
+                                    class="p-3 border border-slate-300 align-top"
+                                  >
+                                    <div class="flex gap-4">
+                                      <div
+                                        class="font-bold min-w-[80px] text-slate-600"
+                                      >
+                                        {{ req.level }}
+                                      </div>
+                                      <ul
+                                        class="list-disc list-outside ml-4 space-y-1 flex-1"
+                                      >
+                                        @for (
+                                          edu of expandList(req.education);
+                                          track $index
+                                        ) {
+                                          <li
+                                            [class.list-none]="
+                                              isBulletless(edu)
+                                            "
+                                            [style.list-style-type]="
+                                              isSubItem(edu) ? 'circle' : ''
+                                            "
+                                            [class.-ml-4]="isConnector(edu)"
+                                            [class.font-bold]="isConnector(edu)"
+                                            [class.text-center]="
+                                              isConnector(edu)
+                                            "
+                                            [class.ml-6]="isSubItem(edu)"
+                                            [class.text-sm]="
+                                              isParenthetical(edu)
+                                            "
+                                            [class.text-slate-500]="
+                                              isParenthetical(edu)
+                                            "
+                                          >
+                                            <span
+                                              [innerHTML]="
+                                                formatTextWithNotes(
+                                                  isSubItem(edu)
+                                                    ? cleanSubItem(edu)
+                                                    : edu
+                                                )
+                                              "
+                                            ></span>
+                                          </li>
+                                        }
+                                      </ul>
+                                    </div>
+                                  </td>
+                                  <td
+                                    class="p-3 border border-slate-300 align-top"
+                                  >
+                                    <ul
+                                      class="list-disc list-outside ml-4 space-y-1"
+                                    >
+                                      @for (
+                                        exp of expandList(req.experience);
+                                        track $index
+                                      ) {
+                                        <li
+                                          [class.list-none]="isBulletless(exp)"
+                                          [style.list-style-type]="
+                                            isSubItem(exp) ? 'circle' : ''
+                                          "
+                                          [class.-ml-4]="isConnector(exp)"
+                                          [class.font-bold]="isConnector(exp)"
+                                          [class.text-center]="isConnector(exp)"
+                                          [class.ml-6]="isSubItem(exp)"
+                                          [class.text-sm]="isParenthetical(exp)"
+                                          [class.text-slate-500]="
+                                            isParenthetical(exp)
+                                          "
+                                        >
+                                          <span
+                                            [innerHTML]="
+                                              formatTextWithNotes(
+                                                isSubItem(exp)
+                                                  ? cleanSubItem(exp)
+                                                  : exp
+                                              )
+                                            "
+                                          ></span>
+                                        </li>
+                                      }
+                                    </ul>
+                                  </td>
+                                </tr>
+                              }
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+
+                      @if (detail.notes.length > 0) {
+                        <div class="mt-6 text-xs text-slate-600">
+                          <p class="font-bold mb-2">Notes</p>
+                          <div class="space-y-4">
+                            @for (note of detail.notes; track note) {
+                              <div class="whitespace-pre-wrap">{{ note }}</div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                } @else {
+                  <!-- FALLBACK VIEW -->
+                  <div
+                    [innerHTML]="
+                      job.htmlContent || formatRequirements(job.requirements)
+                    "
+                  ></div>
+                }
+              </div>
+            </div>
+          } @else {
+            <!-- LIST VIEW -->
+            <!-- Search Bar -->
+            <div class="p-4 bg-slate-50 border-b border-slate-200 shrink-0">
+              <div class="relative">
+                <input
+                  #searchInput
+                  type="text"
+                  placeholder="Rechercher par titre, ID, abréviation..."
+                  class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                  (input)="onSearch(searchInput.value)"
+                  aria-label="Rechercher un métier"
+                />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Results List -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+              @for (job of filteredJobs(); track job.id) {
+                <div
+                  class="p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all group cursor-pointer bg-white"
+                  (click)="selectJob(job)"
+                >
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="flex-1 min-w-0 mr-3">
+                      <h3
+                        class="font-bold text-slate-800 text-lg group-hover:text-indigo-700 transition-colors"
+                      >
+                        {{ job.title }}
+                      </h3>
+
+                      <div
+                        class="flex items-center flex-wrap gap-2 text-xs font-mono text-slate-500 mt-2"
+                      >
+                        <!-- ENCADRÉ 1 : Pastilles 1 (ID), 2 (Abréviation), 3 (MR/Off), 4 (Élément) -->
+                        <div class="inline-flex items-center flex-wrap gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg">
+                          <span
+                            class="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700 font-semibold"
+                            title="Numéro de métier"
+                          >
+                            ID: {{ job.id }}
+                          </span>
+                          <span
+                            class="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700 font-semibold"
+                            title="Abréviation"
+                          >
+                            {{ job.abbreviation }}
+                          </span>
+
+                          <!-- Pastille 3 : Officier / MR -->
+                          @if (isOfficerJob(job.id)) {
+                            <span
+                              class="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200 font-sans text-[10px] font-bold uppercase tracking-wider"
+                              title="Officier"
+                            >
+                              Off
+                            </span>
+                          } @else {
+                            <span
+                              class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded border border-orange-200 font-sans text-[10px] font-bold uppercase tracking-wider"
+                              title="Militaire du rang"
+                            >
+                              MR
+                            </span>
+                          }
+
+                          <!-- Pastille 4 : Élément -->
+                          @if (job.element) {
+                            <span
+                              class="px-1.5 py-0.5 rounded border font-sans text-[10px] font-bold tracking-wider"
+                              [class.bg-amber-100]="job.element === 'CMP'"
+                              [class.text-amber-800]="job.element === 'CMP'"
+                              [class.border-amber-200]="job.element === 'CMP'"
+                              [class.bg-emerald-100]="job.element === 'Armée'"
+                              [class.text-emerald-800]="job.element === 'Armée'"
+                              [class.border-emerald-200]="job.element === 'Armée'"
+                              [class.bg-sky-100]="job.element === 'Air'"
+                              [class.text-sky-800]="job.element === 'Air'"
+                              [class.border-sky-200]="job.element === 'Air'"
+                              [class.bg-indigo-100]="job.element === 'Marine'"
+                              [class.text-indigo-800]="job.element === 'Marine'"
+                              [class.border-indigo-200]="job.element === 'Marine'"
+                              [title]="job.element === 'CMP' ? 'CMP - Choix du postulant' : 'Élément ' + job.element"
+                            >
+                              {{ job.element }}
+                            </span>
+                          }
+                        </div>
+
+                        <!-- ENCADRÉ 2 : Pastilles 5 (CC/RP) et 8 (Critère médical) -->
+                        <div class="inline-flex items-center flex-wrap gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg">
+                          <!-- Pastille 5 : CC et RP -->
+                          @if (isJobRp(job.id)) {
+                            <span
+                              class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200 font-sans text-[10px] font-bold uppercase tracking-wider"
+                              title="Citoyen canadien"
+                            >
+                              CC
+                            </span>
+                            <span
+                              class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 font-sans text-[10px] font-bold uppercase tracking-wider"
+                              title="Résident permanent"
+                            >
+                              RP
+                            </span>
+                          } @else {
+                            <span
+                              class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200 font-sans text-[10px] font-bold uppercase tracking-wider"
+                              title="Citoyen canadien seulement"
+                            >
+                              CC seulement
+                            </span>
+                          }
+
+                          <!-- Pastille 8 : Critère médical -->
+                          @if (job.medicalStandard) {
+                            <span
+                              class="bg-white text-slate-600 px-1.5 py-0.5 rounded border border-slate-200 font-mono tracking-tighter text-[11px]"
+                              title="Norme médicale minimale requise (V CV H G O A)"
+                            >
+                              V{{job.medicalStandard.v}} CV{{job.medicalStandard.cv}} H{{job.medicalStandard.h}} G{{job.medicalStandard.g}} O{{job.medicalStandard.o}} A{{job.medicalStandard.a}}
+                            </span>
+                          }
+                        </div>
+
+                        <!-- ENCADRÉ 3 : Pastilles 6 (Programmes d'entrée SIP) et 7 (Durée du contrat initial) -->
+                        <div class="inline-flex items-center flex-wrap gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg">
+                          <!-- Pastilles Programmes d'entrée (Ouvert / Fermé SIP) -->
+                          @let programs = jobService.getJobPrograms(job.id);
+                          @for (prog of getObjectKeys(programs); track prog) {
+                            <span
+                              class="px-1.5 py-0.5 rounded font-sans text-[8.5px] font-bold border flex items-center gap-1"
+                              [class.bg-emerald-100]="programs[prog] === 'o'"
+                              [class.text-emerald-800]="programs[prog] === 'o'"
+                              [class.border-emerald-200]="programs[prog] === 'o'"
+                              [class.bg-amber-100]="programs[prog] === 'limité'"
+                              [class.text-amber-800]="programs[prog] === 'limité'"
+                              [class.border-amber-200]="programs[prog] === 'limité'"
+                              [class.bg-rose-100]="programs[prog] === 'f'"
+                              [class.text-rose-800]="programs[prog] === 'f'"
+                              [class.border-rose-200]="programs[prog] === 'f'"
+                              [title]="'SIP ' + prog + ' : ' + (programs[prog] === 'o' ? 'Ouvert' : programs[prog] === 'limité' ? 'Limité' : 'Fermé')"
+                            >
+                              {{ prog }}
+                            </span>
+                          }
+                          @if (getObjectKeys(programs).length === 0) {
+                            <span
+                              class="px-1.5 py-0.5 rounded font-sans text-[8.5px] font-bold bg-white text-slate-500 border border-slate-200"
+                            >
+                              N/A
+                            </span>
+                          }
+
+                          <!-- Pastille 7 : Durée du contrat initial -->
+                          @if (job.contracts) {
+                            @for (
+                              contract of job.contracts;
+                              track contract.program
+                            ) {
+                              <span
+                                class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 font-sans text-[11px]"
+                                title="{{ contract.program }}"
+                              >
+                                {{ contract.duration }}
+                                @if (contract.program !== "Enrôlement direct") {
+                                  ({{ contract.program }})
+                                }
+                              </span>
+                            }
+                          }
+                        </div>
+                      </div>
+                    </div>
+
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5 text-slate-300 group-hover:text-indigo-500 transition-colors shrink-0 mt-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+
+                  <div
+                    class="text-sm text-slate-600 leading-relaxed line-clamp-2"
+                  >
+                    {{ job.requirements }}
+                  </div>
+                </div>
+              } @empty {
+                <div class="text-center py-12 text-slate-400">
+                  <p>Aucun métier trouvé.</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- TAB 2: REORIENTATION -->
+        @if (_showReorientationTab()) {
+          <app-reorientation
+            [class.hidden]="activeTab() !== 'reorientation'"
+            class="flex-1 flex flex-col min-h-0"
+          ></app-reorientation>
+
+          <!-- TAB 2.5: PFOR -->
+          <app-pfor
+            [class.hidden]="activeTab() !== 'pfor'"
+            class="flex-1 flex flex-col min-h-0"
+          ></app-pfor>
+        }
+
+        <!-- TAB 3: MEL -->
+        <app-mel
+          [class.hidden]="activeTab() !== 'mel'"
+          class="flex-1 flex flex-col min-h-0"
+        ></app-mel>
+
+        <!-- Resize Handle (Bottom Right) -->
+        <div
+          class="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize z-50 flex items-end justify-end p-0.5"
+          (mousedown)="startResize($event)"
+          *ngIf="!isFullScreen()"
+        >
+          <div class="w-2 h-2 border-r-2 border-b-2 border-slate-400"></div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [],
+})

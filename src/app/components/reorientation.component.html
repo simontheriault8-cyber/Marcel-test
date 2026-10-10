@@ -1,0 +1,2720 @@
+<div class="h-full flex flex-col min-h-0 bg-slate-50">
+      <div
+        class="p-4 bg-white border-b border-slate-200 shrink-0 flex items-start justify-between relative z-20"
+      >
+        <div class="flex items-start gap-4">
+          <button
+            (click)="resetAll()"
+            class="bg-white p-2 rounded-full shadow-md hover:bg-slate-50 transition-all text-slate-600 shrink-0 border border-slate-200 mt-1 cursor-pointer"
+            title="Réinitialiser"
+          >
+            <svg
+              class="w-5 h-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+          </button>
+          <div>
+            <div class="flex items-center gap-3">
+              <h2 class="text-xl font-bold text-slate-800">
+                Panneau de Réorientation
+              </h2>
+              @if (jobService.sipDate()) {
+                <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-medium border border-indigo-100 flex items-center gap-1.5 shadow-sm">
+                  <svg class="w-3.5 h-3.5 opacity-70" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 2v4"></path>
+                    <path d="M16 2v4"></path>
+                    <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                    <path d="M3 10h18"></path>
+                    <path d="M8 14h.01"></path>
+                    <path d="M12 14h.01"></path>
+                    <path d="M16 14h.01"></path>
+                    <path d="M8 18h.01"></path>
+                    <path d="M12 18h.01"></path>
+                    <path d="M16 18h.01"></path>
+                  </svg>
+                  SIP à jour depuis le {{ jobService.sipDate() }}
+                </span>
+              }
+            </div>
+            <p class="text-sm text-slate-500 mt-1">
+              Évaluation manuelle - Sélectionnez les critères rencontrés par le
+              postulant pour évaluer son profil et générer les options de
+              réorientation.
+            </p>
+          </div>
+        </div>
+
+        <!-- Collapsible Options Dropdown -->
+        <div class="relative shrink-0 reo-options-dropdown-container">
+          <button
+            type="button"
+            (click)="showOptionsDropdown.set(!showOptionsDropdown())"
+            class="flex items-center gap-2 px-3 py-2 rounded-xl border transition-all active:scale-95 cursor-pointer text-xs font-bold shadow-xs"
+            [class.bg-indigo-50]="activeHeaderOptionsCount() > 0"
+            [class.border-indigo-300]="activeHeaderOptionsCount() > 0"
+            [class.text-indigo-950]="activeHeaderOptionsCount() > 0"
+            [class.bg-white]="activeHeaderOptionsCount() === 0"
+            [class.border-slate-200]="activeHeaderOptionsCount() === 0"
+            [class.text-slate-700]="activeHeaderOptionsCount() === 0"
+            [class.hover:bg-slate-50]="activeHeaderOptionsCount() === 0"
+            title="Options supplémentaires"
+          >
+            <svg
+              class="w-4 h-4"
+              [class.text-indigo-600]="activeHeaderOptionsCount() > 0"
+              [class.text-slate-500]="activeHeaderOptionsCount() === 0"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+              />
+            </svg>
+            <span>Options</span>
+            @if (activeHeaderOptionsCount() > 0) {
+              <span class="px-2 py-0.5 bg-indigo-600 text-white rounded-full text-[10px] font-extrabold shadow-xs">
+                {{ activeHeaderOptionsCount() }}
+              </span>
+            }
+            <svg
+              class="w-3.5 h-3.5 transition-transform duration-200"
+              [class.rotate-180]="showOptionsDropdown()"
+              [class.text-indigo-600]="activeHeaderOptionsCount() > 0"
+              [class.text-slate-400]="activeHeaderOptionsCount() === 0"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          @if (showOptionsDropdown()) {
+            <div
+              class="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3.5 z-50 flex flex-col gap-2.5"
+            >
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span class="text-xs font-black uppercase tracking-wider text-slate-600">Options du volet</span>
+                @if (activeHeaderOptionsCount() > 0) {
+                  <span class="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                    {{ activeHeaderOptionsCount() }} active(s)
+                  </span>
+                }
+              </div>
+
+              <div class="flex flex-col gap-2.5 pt-1">
+                <label
+                  class="flex items-center gap-2.5 text-xs font-semibold text-slate-700 hover:text-slate-900 cursor-pointer select-none p-1.5 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    class="peer h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none transition-all shrink-0 cursor-pointer"
+                    [checked]="ignoreSip()"
+                    (change)="toggleIgnoreSip()"
+                  />
+                  <span class="relative flex items-center">
+                    <svg
+                      class="absolute -left-[1.25rem] w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Ignorer le SIP
+                  </span>
+                </label>
+
+                <label
+                  class="flex items-center gap-2.5 text-xs font-semibold text-slate-700 hover:text-slate-900 cursor-pointer select-none p-1.5 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    class="peer h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none transition-all shrink-0 cursor-pointer"
+                    [checked]="hasMedicalLimitation()"
+                    (change)="toggleMedicalLimitation()"
+                  />
+                  <span class="relative flex items-center">
+                    <svg
+                      class="absolute -left-[1.25rem] w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Limitation médicale
+                  </span>
+                </label>
+
+                <label
+                  class="flex items-center gap-2.5 text-xs font-semibold text-slate-700 hover:text-slate-900 cursor-pointer select-none p-1.5 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    class="peer h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none transition-all shrink-0 cursor-pointer"
+                    [checked]="includeTraitement()"
+                    (change)="toggleIncludeTraitement()"
+                  />
+                  <span class="relative flex items-center">
+                    <svg
+                      class="absolute -left-[1.25rem] w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Inclure opération de traitement
+                  </span>
+                </label>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div
+        class="flex-1 overflow-y-auto p-4 flex flex-col lg:flex-row gap-6 min-h-0"
+      >
+        <!-- Colonne de gauche: Critères -->
+        <div
+          class="flex flex-col gap-6 transition-all duration-300"
+          [class.lg:w-7/12]="showResultsPanel()"
+          [class.w-full]="!showResultsPanel()"
+          [class.max-w-4xl]="!showResultsPanel()"
+          [class.mx-auto]="!showResultsPanel()"
+        >
+          <!-- Age and Citizenship -->
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white border border-slate-200 rounded-xl shadow-sm shrink-0"
+          >
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1"
+                >Âge du postulant</label
+              >
+              <input
+                type="number"
+                [ngModel]="age()"
+                (ngModelChange)="age.set($event)"
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
+                placeholder="Ex: 18"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1"
+                >Statut de citoyenneté</label
+              >
+              <select
+                [ngModel]="citizenship()"
+                (ngModelChange)="citizenship.set($event)"
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
+              >
+                <option value="Canadian Citizen">Citoyen canadien</option>
+                <option value="PR > 3 years">
+                  Résident permanent admissible
+                </option>
+                <option value="PR < 3 years">
+                  Résident permanent inadmissible
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Panneau Cote médicale (affiché seulement si limitation médicale est coché) -->
+          @if (hasMedicalLimitation()) {
+            <div
+              class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm shrink-0 flex flex-col transition-all duration-200"
+            >
+              <div class="mb-2 text-sm font-bold text-slate-800">
+                Cote Médicale
+              </div>
+              <!-- 3 petits champs pour la cote médicale (V, CV, H) -->
+              <div class="flex items-center justify-center overflow-x-auto pb-1 sm:pb-0 w-full">
+                <div
+                  class="inline-flex border border-slate-300 rounded-lg overflow-hidden bg-slate-50 divide-x divide-slate-300 shadow-sm"
+                >
+                  <div class="flex flex-col items-center">
+                    <div
+                      class="px-3 py-1 bg-slate-100 text-xs font-bold text-slate-700 border-b border-slate-300 w-full text-center"
+                    >
+                      V
+                    </div>
+                    <input
+                      type="text"
+                      [ngModel]="medicalV()"
+                      (ngModelChange)="medicalV.set($event)"
+                      class="w-12 sm:w-14 px-1 py-1.5 text-center text-sm font-semibold text-slate-800 bg-white outline-none focus:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:z-10 transition-colors"
+                    />
+                  </div>
+                  <div class="flex flex-col items-center">
+                    <div
+                      class="px-3 py-1 bg-slate-100 text-xs font-bold text-slate-700 border-b border-slate-300 w-full text-center"
+                    >
+                      CV
+                    </div>
+                    <input
+                      type="text"
+                      [ngModel]="medicalCV()"
+                      (ngModelChange)="medicalCV.set($event)"
+                      class="w-12 sm:w-14 px-1 py-1.5 text-center text-sm font-semibold text-slate-800 bg-white outline-none focus:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:z-10 transition-colors"
+                    />
+                  </div>
+                  <div class="flex flex-col items-center">
+                    <div
+                      class="px-3 py-1 bg-slate-100 text-xs font-bold text-slate-700 border-b border-slate-300 w-full text-center"
+                    >
+                      H
+                    </div>
+                    <input
+                      type="text"
+                      [ngModel]="medicalH()"
+                      (ngModelChange)="medicalH.set($event)"
+                      class="w-12 sm:w-14 px-1 py-1.5 text-center text-sm font-semibold text-slate-800 bg-white outline-none focus:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:z-10 transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Medical Employment Limitations Table -->
+              <div class="mt-6 border border-slate-300 rounded-lg overflow-hidden w-full text-sm">
+                <div class="bg-blue-100 font-bold text-center py-2 border-b border-slate-300 text-slate-800">
+                  Medical Employment Limitations
+                </div>
+                
+                <!-- Geographic Section -->
+                <div class="flex flex-col md:flex-row border-b border-slate-300 bg-white">
+                  <div class="w-full md:w-32 bg-slate-200 flex items-center justify-center font-bold text-slate-700 border-b md:border-b-0 md:border-r border-slate-300 py-2 md:py-0">
+                    <span class="tracking-wider">Geographic</span>
+                  </div>
+                  <div class="flex-1 flex flex-col">
+                    @for (mel of geographicLimitations; track mel.id) {
+                      <label class="flex items-start gap-3 p-2.5 hover:bg-slate-50 border-b border-slate-200 cursor-pointer transition-colors last:border-b-0">
+                        <input type="checkbox" 
+                               [checked]="hasMel(mel.id)" 
+                               (change)="toggleMel(mel.id)"
+                               class="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 bg-white cursor-pointer" />
+                        <span class="text-slate-700 leading-snug">{{ mel.text }}</span>
+                      </label>
+                    }
+                  </div>
+                </div>
+
+                <!-- Occupational Section -->
+                <div class="flex flex-col md:flex-row bg-white">
+                  <div class="w-full md:w-32 bg-slate-200 flex items-center justify-center font-bold text-slate-700 border-b md:border-b-0 md:border-r border-slate-300 py-2 md:py-0">
+                    <span class="tracking-wider">Occupational</span>
+                  </div>
+                  <div class="flex-1 flex flex-col">
+                    @for (mel of occupationalLimitations; track mel.id) {
+                      <label class="flex items-start gap-3 p-2.5 hover:bg-slate-50 border-b border-slate-200 cursor-pointer transition-colors last:border-b-0">
+                        <input type="checkbox" 
+                               [checked]="hasMel(mel.id)" 
+                               (change)="toggleMel(mel.id)"
+                               class="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 bg-white cursor-pointer" />
+                        <span class="text-slate-700 leading-snug">{{ mel.text }}</span>
+                      </label>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Message d'admissibilité pour RP < 3 ans -->
+          <div
+            *ngIf="citizenship() === 'PR < 3 years'"
+            class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl flex items-start gap-3 shadow-sm transition-all duration-300 shrink-0"
+          >
+            <svg
+              class="w-5 h-5 text-red-600 shrink-0 mt-0.5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div>
+              <p class="font-bold text-sm">Non admissible</p>
+              <p class="text-xs text-red-700 mt-0.5">
+                Les résidents permanents de moins de trois ans ne sont pas
+                admissibles aux Forces armées canadiennes.
+              </p>
+            </div>
+          </div>
+
+          <!-- Message pour limite d'âge de retraite forcée (âge >= 57 ou dépassement de durée de contrat) -->
+          <div
+            *ngIf="age() !== null && (age()! >= 57 || isCandidateTooOld())"
+            class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl flex items-start gap-3 shadow-sm transition-all duration-300 shrink-0"
+          >
+            <svg
+              class="w-5 h-5 text-red-600 shrink-0 mt-0.5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div>
+              <p class="font-bold text-sm">
+                {{ age()! >= 57 ? "Âge maximal d'enrôlement dépassé (57 ans et plus)" : "Âge limite dépassé pour les choix de contrats" }}
+              </p>
+              <p class="text-xs text-red-700 mt-0.5">
+                {{ age()! >= 57 
+                  ? "57 ans et plus est automatiquement inadmissible aux Forces armées canadiennes. L'âge maximal d'enrôlement admissible est de 56 ans."
+                  : "La règle de durée des contrats initiaux s'applique : Admissible = 59 - durée du contrat initial ou moins (Inadmissible = 60 - durée du contrat initial ou plus)."
+                }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Panneau: Métiers déjà au dossier du postulant -->
+          <div
+            class="p-5 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow shrink-0 flex flex-col gap-4"
+          >
+            <div>
+              <h3
+                class="text-md font-bold text-slate-800 flex items-center gap-2"
+              >
+                <svg
+                  class="w-5 h-5 text-indigo-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Métiers déjà au dossier du postulant
+              </h3>
+              <p class="text-xs text-slate-500 mt-1">
+                Recherchez et sélectionnez jusqu'à trois métiers déjà inscrits
+                dans le dossier du candidat pour évaluer instantanément son
+                admissibilité réglementaire (âge de retraite forcée,
+                citoyenneté, et scolarité requise).
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <!-- Field 1 -->
+              <div
+                class="relative flex flex-col gap-2 p-4 bg-slate-50/50 border border-slate-200 rounded-xl"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-slate-500"
+                    >Choix Métier #1</span
+                  >
+                  <button
+                    *ngIf="hasSelected(1)"
+                    (click)="clearDossierJob(1, $event)"
+                    class="text-xs text-rose-500 hover:text-rose-700 font-semibold transition flex items-center gap-0.5"
+                  >
+                    <svg
+                      class="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.5"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    Retirer
+                  </button>
+                </div>
+
+                <div class="relative">
+                  <div
+                    class="flex items-center border border-slate-300 rounded-lg bg-white shadow-xs focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500"
+                    [class.opacity-50]="isFieldDisabled(1)"
+                    [class.bg-slate-100]="isFieldDisabled(1)"
+                    [class.cursor-not-allowed]="isFieldDisabled(1)"
+                  >
+                    <input
+                      type="text"
+                      [ngModel]="searchDossierQuery1()"
+                      (ngModelChange)="onQueryChange(1, $event)"
+                      (focus)="openDropdown(1)"
+                      (blur)="closeDropdownDelayed(1)"
+                      [disabled]="isFieldDisabled(1)"
+                      class="w-full px-3 py-2 text-sm outline-none bg-transparent"
+                      [class.cursor-not-allowed]="isFieldDisabled(1)"
+                      placeholder="Rechercher..."
+                    />
+                    <button
+                      *ngIf="!dropdownOpen1() && !isFieldDisabled(1)"
+                      class="p-1 px-2 text-slate-400"
+                      (click)="openDropdown(1)"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      *ngIf="dropdownOpen1() && !isFieldDisabled(1)"
+                      class="p-1 px-2 text-slate-400"
+                    >
+                      <svg
+                        class="w-4 h-4 transform rotate-180"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Dropdown Search Results -->
+                  <div
+                    *ngIf="dropdownOpen1()"
+                    class="absolute z-50 left-0 right-0 mt-1 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg"
+                  >
+                    @if (filteredDossierJobs1().length === 0) {
+                      <div class="p-3 text-xs text-slate-500 italic">
+                        Aucun métier trouvé
+                      </div>
+                    } @else {
+                      @for (job of filteredDossierJobs1(); track job.id) {
+                        <button
+                          (click)="selectDossierJob(1, job.id)"
+                          class="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-100 last:border-0"
+                        >
+                          <span class="text-slate-800 font-medium"
+                            ><span class="font-bold text-indigo-600 mr-1"
+                              >[{{ job.id }}]</span
+                            >
+                            {{ job.title }}</span
+                          >
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Admissibility Box for Field 1 -->
+                @if (selectedDossierJobId1()) {
+                  @let s1 = evaluateJobAdmissibility(selectedDossierJobId1());
+                  @if (s1) {
+                    <div
+                      class="mt-2 p-3 rounded-lg border text-xs bg-white"
+                      [class.bg-emerald-50]="s1.isEligible"
+                      [class.border-emerald-200]="s1.isEligible"
+                      [class.bg-rose-50]="!s1.isEligible"
+                      [class.border-rose-200]="!s1.isEligible"
+                    >
+                      <div
+                        class="flex items-center justify-between font-bold mb-1"
+                        [class.text-emerald-800]="s1.isEligible"
+                        [class.text-rose-800]="!s1.isEligible"
+                      >
+                        <span>{{
+                          s1.isEligible ? "ADMISSIBLE" : "NON ADMISSIBLE"
+                        }}</span>
+                        <span
+                          class="text-[10px] font-mono bg-white/50 px-1 py-0.5 rounded"
+                          >ID {{ s1.job.id }}</span
+                        >
+                      </div>
+                      <p class="font-semibold text-slate-700 truncate mb-2">
+                        {{ s1.job.title }}
+                      </p>
+
+                      @if (s1.job.id !== '00003') {
+                        <div class="space-y-1 text-[11px] text-slate-600">
+                          <!-- Age detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="s1.isAgeAdmissible"
+                              [class.text-rose-600]="!s1.isAgeAdmissible"
+                            >
+                              {{ s1.isAgeAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Âge : </span>
+                              @if (age() === null || age()! <= 0) {
+                                <span class="italic text-slate-500"
+                                  >Non renseigné (Contrat :
+                                  {{ s1.durationYears }} ans - âge max:
+                                  {{ 59 - s1.durationYears }} ans)</span
+                                >
+                              } @else {
+                                <span
+                                  >{{ age() }} ans.
+                                  @if (!s1.isAgeAdmissible) {
+                                    {{ s1.ageReason }}
+                                  } @else {
+                                    OK (Contrat {{ s1.durationYears }} ans).
+                                  }
+                                </span>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Citizenship detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="
+                                s1.isCitizenshipAdmissible
+                              "
+                              [class.text-rose-600]="!s1.isCitizenshipAdmissible"
+                            >
+                              {{ s1.isCitizenshipAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Statut : </span>
+                              <span>
+                                @if (citizenship() === "Canadian Citizen") {
+                                  Citoyen canadien (OK).
+                                } @else if (citizenship() === "PR > 3 years") {
+                                  R.P. > 3 ans.
+                                  @if (!s1.isCitizenshipAdmissible) {
+                                    {{ s1.citizenshipReason }}
+                                  } @else {
+                                    OK.
+                                  }
+                                } @else {
+                                  R.P. < 3 ans (Inadmissible).
+                                }
+                              </span>
+                            </div>
+                          </div>
+
+                          <!-- Qualifications detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="s1.isEducationAdmissible"
+                              [class.text-rose-600]="!s1.isEducationAdmissible"
+                            >
+                              {{ s1.isEducationAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Scolarité : </span>
+                              <span
+                                [class.text-rose-700]="!s1.isEducationAdmissible"
+                                [class.text-emerald-700]="
+                                  s1.isEducationAdmissible
+                                "
+                              >
+                                {{
+                                  s1.isEducationAdmissible
+                                    ? "Scolarité/expérience rencontrée (OK)."
+                                    : "Scolarité/expérience non rencontrée."
+                                }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <!-- Extra Test detail -->
+                          @if (s1.isExtraTestRequired) {
+                            <div class="flex items-start gap-1">
+                              <span
+                                class="font-bold"
+                                [class.text-emerald-600]="s1.isExtraTestAdmissible"
+                                [class.text-rose-600]="!s1.isExtraTestAdmissible"
+                              >
+                                {{ s1.isExtraTestAdmissible ? "✓" : "✗" }}
+                              </span>
+                              <div>
+                                <span class="font-semibold">Test de sélection ({{ s1.extraTestName }}) : </span>
+                                <span
+                                  [class.text-rose-700]="!s1.isExtraTestAdmissible"
+                                  [class.text-emerald-700]="s1.isExtraTestAdmissible"
+                                >
+                                  {{
+                                    s1.isExtraTestAdmissible
+                                      ? "Test réussi (OK)."
+                                      : (testCspnNotCompleted() && (s1.job.id === '00182' || s1.job.id === '00183' || s1.job.id === '00184'))
+                                        ? "Pas encore complété (Inadmissible)."
+                                        : "Test non réussi ou non complété."
+                                  }}
+                                </span>
+                              </div>
+                            </div>
+                          }
+
+                          <!-- Medical detail -->
+                          @if (hasMedicalLimitation()) {
+                            <div class="flex items-start gap-1">
+                              <span
+                                class="font-bold"
+                                [class.text-emerald-600]="s1.isMedicalAdmissible"
+                                [class.text-rose-600]="!s1.isMedicalAdmissible"
+                              >
+                                {{ s1.isMedicalAdmissible ? "✓" : "✗" }}
+                              </span>
+                              <div>
+                                <span class="font-semibold">Cote médicale : </span>
+                                <span
+                                  [class.text-rose-700]="!s1.isMedicalAdmissible"
+                                  [class.text-emerald-700]="s1.isMedicalAdmissible"
+                                >
+                                  {{
+                                    s1.isMedicalAdmissible
+                                      ? "Conforme aux exigences (OK)."
+                                      : s1.medicalReason
+                                  }}
+                                </span>
+                              </div>
+                            </div>
+                          }
+                        </div>
+
+                        <!-- SIP Status Warning -->
+                        @if (s1.isJobClosed) {
+                          <div
+                            class="mt-2 p-1.5 rounded border flex items-start gap-1.5 font-semibold text-[10px] leading-tight"
+                            [class]="s1.isClosedAdmissionOnly ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-red-100 text-red-800 border-red-200'"
+                          >
+                            <span>⚠</span>
+                            <div>
+                              @if (s1.isClosedAdmissionOnly) {
+                                Ce métier est fermé pour admission (ouvert en traitement).
+                              } @else {
+                                Ce métier est présentement FERMÉ dans le SIP (aucune vacance).
+                              }
+                            </div>
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                }
+              </div>
+
+              <!-- Field 2 -->
+              <div
+                class="relative flex flex-col gap-2 p-4 bg-slate-50/50 border border-slate-200 rounded-xl"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-slate-500"
+                    >Choix Métier #2</span
+                  >
+                  <button
+                    *ngIf="hasSelected(2)"
+                    (click)="clearDossierJob(2, $event)"
+                    class="text-xs text-rose-500 hover:text-rose-700 font-semibold transition flex items-center gap-0.5"
+                  >
+                    <svg
+                      class="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.5"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    Retirer
+                  </button>
+                </div>
+
+                <div class="relative">
+                  <div
+                    class="flex items-center border border-slate-300 rounded-lg bg-white shadow-xs focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500"
+                    [class.opacity-50]="isFieldDisabled(2)"
+                    [class.bg-slate-100]="isFieldDisabled(2)"
+                    [class.cursor-not-allowed]="isFieldDisabled(2)"
+                  >
+                    <input
+                      type="text"
+                      [ngModel]="searchDossierQuery2()"
+                      (ngModelChange)="onQueryChange(2, $event)"
+                      (focus)="openDropdown(2)"
+                      (blur)="closeDropdownDelayed(2)"
+                      [disabled]="isFieldDisabled(2)"
+                      class="w-full px-3 py-2 text-sm outline-none bg-transparent"
+                      [class.cursor-not-allowed]="isFieldDisabled(2)"
+                      placeholder="Rechercher..."
+                    />
+                    <button
+                      *ngIf="!dropdownOpen2() && !isFieldDisabled(2)"
+                      class="p-1 px-2 text-slate-400"
+                      (click)="openDropdown(2)"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      *ngIf="dropdownOpen2() && !isFieldDisabled(2)"
+                      class="p-1 px-2 text-slate-400"
+                    >
+                      <svg
+                        class="w-4 h-4 transform rotate-180"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Dropdown Search Results -->
+                  <div
+                    *ngIf="dropdownOpen2()"
+                    class="absolute z-50 left-0 right-0 mt-1 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg"
+                  >
+                    @if (filteredDossierJobs2().length === 0) {
+                      <div class="p-3 text-xs text-slate-500 italic">
+                        Aucun métier trouvé
+                      </div>
+                    } @else {
+                      @for (job of filteredDossierJobs2(); track job.id) {
+                        <button
+                          (click)="selectDossierJob(2, job.id)"
+                          class="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-100 last:border-0"
+                        >
+                          <span class="text-slate-800 font-medium"
+                            ><span class="font-bold text-indigo-600 mr-1"
+                              >[{{ job.id }}]</span
+                            >
+                            {{ job.title }}</span
+                          >
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Admissibility Box for Field 2 -->
+                @if (selectedDossierJobId2()) {
+                  @let s2 = evaluateJobAdmissibility(selectedDossierJobId2());
+                  @if (s2) {
+                    <div
+                      class="mt-2 p-3 rounded-lg border text-xs bg-white"
+                      [class.bg-emerald-50]="s2.isEligible"
+                      [class.border-emerald-200]="s2.isEligible"
+                      [class.bg-rose-50]="!s2.isEligible"
+                      [class.border-rose-200]="!s2.isEligible"
+                    >
+                      <div
+                        class="flex items-center justify-between font-bold mb-1"
+                        [class.text-emerald-800]="s2.isEligible"
+                        [class.text-rose-800]="!s2.isEligible"
+                      >
+                        <span>{{
+                          s2.isEligible ? "ADMISSIBLE" : "NON ADMISSIBLE"
+                        }}</span>
+                        <span
+                          class="text-[10px] font-mono bg-white/50 px-1 py-0.5 rounded"
+                          >ID {{ s2.job.id }}</span
+                        >
+                      </div>
+                      <p class="font-semibold text-slate-700 truncate mb-2">
+                        {{ s2.job.title }}
+                      </p>
+
+                      @if (s2.job.id !== '00003') {
+                        <div class="space-y-1 text-[11px] text-slate-600">
+                          <!-- Age detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="s2.isAgeAdmissible"
+                              [class.text-rose-600]="!s2.isAgeAdmissible"
+                            >
+                              {{ s2.isAgeAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Âge : </span>
+                              @if (age() === null || age()! <= 0) {
+                                <span class="italic text-slate-500"
+                                  >Non renseigné (Contrat :
+                                  {{ s2.durationYears }} ans - âge max:
+                                  {{ 59 - s2.durationYears }} ans)</span
+                                >
+                              } @else {
+                                <span
+                                  >{{ age() }} ans.
+                                  @if (!s2.isAgeAdmissible) {
+                                    {{ s2.ageReason }}
+                                  } @else {
+                                    OK (Contrat {{ s2.durationYears }} ans).
+                                  }
+                                </span>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Citizenship detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="
+                                s2.isCitizenshipAdmissible
+                              "
+                              [class.text-rose-600]="!s2.isCitizenshipAdmissible"
+                            >
+                              {{ s2.isCitizenshipAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Statut : </span>
+                              <span>
+                                @if (citizenship() === "Canadian Citizen") {
+                                  Citoyen canadien (OK).
+                                } @else if (citizenship() === "PR > 3 years") {
+                                  R.P. > 3 ans.
+                                  @if (!s2.isCitizenshipAdmissible) {
+                                    {{ s2.citizenshipReason }}
+                                  } @else {
+                                    OK.
+                                  }
+                                } @else {
+                                  R.P. < 3 ans (Inadmissible).
+                                }
+                              </span>
+                            </div>
+                          </div>
+
+                          <!-- Qualifications detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="s2.isEducationAdmissible"
+                              [class.text-rose-600]="!s2.isEducationAdmissible"
+                            >
+                              {{ s2.isEducationAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Scolarité : </span>
+                              <span
+                                [class.text-rose-700]="!s2.isEducationAdmissible"
+                                [class.text-emerald-700]="
+                                  s2.isEducationAdmissible
+                                "
+                              >
+                                {{
+                                  s2.isEducationAdmissible
+                                    ? "Scolarité/expérience rencontrée (OK)."
+                                    : "Scolarité/expérience non rencontrée."
+                                }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <!-- Extra Test detail -->
+                          @if (s2.isExtraTestRequired) {
+                            <div class="flex items-start gap-1">
+                              <span
+                                class="font-bold"
+                                [class.text-emerald-600]="s2.isExtraTestAdmissible"
+                                [class.text-rose-600]="!s2.isExtraTestAdmissible"
+                              >
+                                {{ s2.isExtraTestAdmissible ? "✓" : "✗" }}
+                              </span>
+                              <div>
+                                <span class="font-semibold">Test de sélection ({{ s2.extraTestName }}) : </span>
+                                <span
+                                  [class.text-rose-700]="!s2.isExtraTestAdmissible"
+                                  [class.text-emerald-700]="s2.isExtraTestAdmissible"
+                                >
+                                  {{
+                                    s2.isExtraTestAdmissible
+                                      ? "Test réussi (OK)."
+                                      : (testCspnNotCompleted() && (s2.job.id === '00182' || s2.job.id === '00183' || s2.job.id === '00184'))
+                                        ? "Pas encore complété (Inadmissible)."
+                                        : "Test non réussi ou non complété."
+                                  }}
+                                </span>
+                              </div>
+                            </div>
+                          }
+
+                          <!-- Medical detail -->
+                          @if (hasMedicalLimitation()) {
+                            <div class="flex items-start gap-1">
+                              <span
+                                class="font-bold"
+                                [class.text-emerald-600]="s2.isMedicalAdmissible"
+                                [class.text-rose-600]="!s2.isMedicalAdmissible"
+                              >
+                                {{ s2.isMedicalAdmissible ? "✓" : "✗" }}
+                              </span>
+                              <div>
+                                <span class="font-semibold">Cote médicale : </span>
+                                <span
+                                  [class.text-rose-700]="!s2.isMedicalAdmissible"
+                                  [class.text-emerald-700]="s2.isMedicalAdmissible"
+                                >
+                                  {{
+                                    s2.isMedicalAdmissible
+                                      ? "Conforme aux exigences (OK)."
+                                      : s2.medicalReason
+                                  }}
+                                </span>
+                              </div>
+                            </div>
+                          }
+                        </div>
+
+                        <!-- SIP Status Warning -->
+                        @if (s2.isJobClosed) {
+                          <div
+                            class="mt-2 p-1.5 rounded border flex items-start gap-1.5 font-semibold text-[10px] leading-tight"
+                            [class]="s2.isClosedAdmissionOnly ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-red-100 text-red-800 border-red-200'"
+                          >
+                            <span>⚠</span>
+                            <div>
+                              @if (s2.isClosedAdmissionOnly) {
+                                Ce métier est fermé pour admission (ouvert en traitement).
+                              } @else {
+                                Ce métier est présentement FERMÉ dans le SIP (aucune vacance).
+                              }
+                            </div>
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                }
+              </div>
+
+              <!-- Field 3 -->
+              <div
+                class="relative flex flex-col gap-2 p-4 bg-slate-50/50 border border-slate-200 rounded-xl"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-slate-500"
+                    >Choix Métier #3</span
+                  >
+                  <button
+                    *ngIf="hasSelected(3)"
+                    (click)="clearDossierJob(3, $event)"
+                    class="text-xs text-rose-500 hover:text-rose-700 font-semibold transition flex items-center gap-0.5"
+                  >
+                    <svg
+                      class="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.5"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    Retirer
+                  </button>
+                </div>
+
+                <div class="relative">
+                  <div
+                    class="flex items-center border border-slate-300 rounded-lg bg-white shadow-xs focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500"
+                    [class.opacity-50]="isFieldDisabled(3)"
+                    [class.bg-slate-100]="isFieldDisabled(3)"
+                    [class.cursor-not-allowed]="isFieldDisabled(3)"
+                  >
+                    <input
+                      type="text"
+                      [ngModel]="searchDossierQuery3()"
+                      (ngModelChange)="onQueryChange(3, $event)"
+                      (focus)="openDropdown(3)"
+                      (blur)="closeDropdownDelayed(3)"
+                      [disabled]="isFieldDisabled(3)"
+                      class="w-full px-3 py-2 text-sm outline-none bg-transparent"
+                      [class.cursor-not-allowed]="isFieldDisabled(3)"
+                      placeholder="Rechercher..."
+                    />
+                    <button
+                      *ngIf="!dropdownOpen3() && !isFieldDisabled(3)"
+                      class="p-1 px-2 text-slate-400"
+                      (click)="openDropdown(3)"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      *ngIf="dropdownOpen3() && !isFieldDisabled(3)"
+                      class="p-1 px-2 text-slate-400"
+                    >
+                      <svg
+                        class="w-4 h-4 transform rotate-180"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Dropdown Search Results -->
+                  <div
+                    *ngIf="dropdownOpen3()"
+                    class="absolute z-50 left-0 right-0 mt-1 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg"
+                  >
+                    @if (filteredDossierJobs3().length === 0) {
+                      <div class="p-3 text-xs text-slate-500 italic">
+                        Aucun métier trouvé
+                      </div>
+                    } @else {
+                      @for (job of filteredDossierJobs3(); track job.id) {
+                        <button
+                          (click)="selectDossierJob(3, job.id)"
+                          class="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-100 last:border-0"
+                        >
+                          <span class="text-slate-800 font-medium"
+                            ><span class="font-bold text-indigo-600 mr-1"
+                              >[{{ job.id }}]</span
+                            >
+                            {{ job.title }}</span
+                          >
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Admissibility Box for Field 3 -->
+                @if (selectedDossierJobId3()) {
+                  @let s3 = evaluateJobAdmissibility(selectedDossierJobId3());
+                  @if (s3) {
+                    <div
+                      class="mt-2 p-3 rounded-lg border text-xs bg-white"
+                      [class.bg-emerald-50]="s3.isEligible"
+                      [class.border-emerald-200]="s3.isEligible"
+                      [class.bg-rose-50]="!s3.isEligible"
+                      [class.border-rose-200]="!s3.isEligible"
+                    >
+                      <div
+                        class="flex items-center justify-between font-bold mb-1"
+                        [class.text-emerald-800]="s3.isEligible"
+                        [class.text-rose-800]="!s3.isEligible"
+                      >
+                        <span>{{
+                          s3.isEligible ? "ADMISSIBLE" : "NON ADMISSIBLE"
+                        }}</span>
+                        <span
+                          class="text-[10px] font-mono bg-white/50 px-1 py-0.5 rounded"
+                          >ID {{ s3.job.id }}</span
+                        >
+                      </div>
+                      <p class="font-semibold text-slate-700 truncate mb-2">
+                        {{ s3.job.title }}
+                      </p>
+
+                      @if (s3.job.id !== '00003') {
+                        <div class="space-y-1 text-[11px] text-slate-600">
+                          <!-- Age detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="s3.isAgeAdmissible"
+                              [class.text-rose-600]="!s3.isAgeAdmissible"
+                            >
+                              {{ s3.isAgeAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Âge : </span>
+                              @if (age() === null || age()! <= 0) {
+                                <span class="italic text-slate-500"
+                                  >Non renseigné (Contrat :
+                                  {{ s3.durationYears }} ans - âge max:
+                                  {{ 59 - s3.durationYears }} ans)</span
+                                >
+                              } @else {
+                                <span
+                                  >{{ age() }} ans.
+                                  @if (!s3.isAgeAdmissible) {
+                                    {{ s3.ageReason }}
+                                  } @else {
+                                    OK (Contrat {{ s3.durationYears }} ans).
+                                  }
+                                </span>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Citizenship detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="
+                                s3.isCitizenshipAdmissible
+                              "
+                              [class.text-rose-600]="!s3.isCitizenshipAdmissible"
+                            >
+                              {{ s3.isCitizenshipAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Statut : </span>
+                              <span>
+                                @if (citizenship() === "Canadian Citizen") {
+                                  Citoyen canadien (OK).
+                                } @else if (citizenship() === "PR > 3 years") {
+                                  R.P. > 3 ans.
+                                  @if (!s3.isCitizenshipAdmissible) {
+                                    {{ s3.citizenshipReason }}
+                                  } @else {
+                                    OK.
+                                  }
+                                } @else {
+                                  R.P. < 3 ans (Inadmissible).
+                                }
+                              </span>
+                            </div>
+                          </div>
+
+                          <!-- Qualifications detail -->
+                          <div class="flex items-start gap-1">
+                            <span
+                              class="font-bold"
+                              [class.text-emerald-600]="s3.isEducationAdmissible"
+                              [class.text-rose-600]="!s3.isEducationAdmissible"
+                            >
+                              {{ s3.isEducationAdmissible ? "✓" : "✗" }}
+                            </span>
+                            <div>
+                              <span class="font-semibold">Scolarité : </span>
+                              <span
+                                [class.text-rose-700]="!s3.isEducationAdmissible"
+                                [class.text-emerald-700]="
+                                  s3.isEducationAdmissible
+                                "
+                              >
+                                {{
+                                  s3.isEducationAdmissible
+                                    ? "Scolarité/expérience rencontrée (OK)."
+                                    : "Scolarité/expérience non rencontrée."
+                                }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <!-- Extra Test detail -->
+                          @if (s3.isExtraTestRequired) {
+                            <div class="flex items-start gap-1">
+                              <span
+                                class="font-bold"
+                                [class.text-emerald-600]="s3.isExtraTestAdmissible"
+                                [class.text-rose-600]="!s3.isExtraTestAdmissible"
+                              >
+                                {{ s3.isExtraTestAdmissible ? "✓" : "✗" }}
+                              </span>
+                              <div>
+                                <span class="font-semibold">Test de sélection ({{ s3.extraTestName }}) : </span>
+                                <span
+                                  [class.text-rose-700]="!s3.isExtraTestAdmissible"
+                                  [class.text-emerald-700]="s3.isExtraTestAdmissible"
+                                >
+                                  {{
+                                    s3.isExtraTestAdmissible
+                                      ? "Test réussi (OK)."
+                                      : (testCspnNotCompleted() && (s3.job.id === '00182' || s3.job.id === '00183' || s3.job.id === '00184'))
+                                        ? "Pas encore complété (Inadmissible)."
+                                        : "Test non réussi ou non complété."
+                                  }}
+                                </span>
+                              </div>
+                            </div>
+                          }
+
+                          <!-- Medical detail -->
+                          @if (hasMedicalLimitation()) {
+                            <div class="flex items-start gap-1">
+                              <span
+                                class="font-bold"
+                                [class.text-emerald-600]="s3.isMedicalAdmissible"
+                                [class.text-rose-600]="!s3.isMedicalAdmissible"
+                              >
+                                {{ s3.isMedicalAdmissible ? "✓" : "✗" }}
+                              </span>
+                              <div>
+                                <span class="font-semibold">Cote médicale : </span>
+                                <span
+                                  [class.text-rose-700]="!s3.isMedicalAdmissible"
+                                  [class.text-emerald-700]="s3.isMedicalAdmissible"
+                                >
+                                  {{
+                                    s3.isMedicalAdmissible
+                                      ? "Conforme aux exigences (OK)."
+                                      : s3.medicalReason
+                                  }}
+                                </span>
+                              </div>
+                            </div>
+                          }
+                        </div>
+
+                        <!-- SIP Status Warning -->
+                        @if (s3.isJobClosed) {
+                          <div
+                            class="mt-2 p-1.5 rounded border flex items-start gap-1.5 font-semibold text-[10px] leading-tight"
+                            [class]="s3.isClosedAdmissionOnly ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-red-100 text-red-800 border-red-200'"
+                          >
+                            <span>⚠</span>
+                            <div>
+                              @if (s3.isClosedAdmissionOnly) {
+                                Ce métier est fermé pour admission (ouvert en traitement).
+                              } @else {
+                                Ce métier est présentement FERMÉ dans le SIP (aucune vacance).
+                              }
+                            </div>
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Scolarité et Expérience -->
+          @if (!isPforApplicant()) {
+            <div class="flex flex-col xl:flex-row gap-6">
+              <!-- Scolarité -->
+            <div
+              class="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1"
+            >
+              <div class="bg-slate-50 border-b border-slate-200 shrink-0">
+                <div class="p-4 pb-0">
+                  <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <h3 class="text-lg font-bold text-slate-800">
+                      Scolarité
+                    </h3>
+                    <div class="flex flex-col items-start gap-1.5 text-sm font-medium text-slate-700">
+                      <label class="inline-flex items-center gap-2 cursor-pointer select-none hover:text-slate-900">
+                        <input
+                          type="checkbox"
+                          [checked]="selectedCriteriaIds().has('etude_anglais')"
+                          (change)="toggleManualCriterion('etude_anglais')"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span>Étude en anglais</span>
+                      </label>
+                      <label class="inline-flex items-center gap-2 cursor-pointer select-none hover:text-slate-900">
+                        <input
+                          type="checkbox"
+                          [checked]="selectedCriteriaIds().has('etude_hors_canada')"
+                          (change)="toggleManualCriterion('etude_hors_canada')"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span>Étude hors Canada</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="flex gap-1 overflow-x-auto scolarite-tabs">
+                    <button
+                      (click)="activeScolariteTab.set('secondaire')"
+                      [class.border-blue-600]="
+                        activeScolariteTab() === 'secondaire'
+                      "
+                      [class.text-blue-600]="
+                        activeScolariteTab() === 'secondaire'
+                      "
+                      [class.border-transparent]="
+                        activeScolariteTab() !== 'secondaire'
+                      "
+                      [class.text-slate-500]="
+                        activeScolariteTab() !== 'secondaire'
+                      "
+                      class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors hover:text-blue-600 hover:bg-slate-100/50 rounded-t-lg"
+                    >
+                      Secondaire
+                    </button>
+                    <button
+                      (click)="activeScolariteTab.set('specialises')"
+                      [class.border-blue-600]="
+                        activeScolariteTab() === 'specialises'
+                      "
+                      [class.text-blue-600]="
+                        activeScolariteTab() === 'specialises'
+                      "
+                      [class.border-transparent]="
+                        activeScolariteTab() !== 'specialises'
+                      "
+                      [class.text-slate-500]="
+                        activeScolariteTab() !== 'specialises'
+                      "
+                      class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors hover:text-blue-600 hover:bg-slate-100/50 rounded-t-lg"
+                    >
+                      Cours spécialisés
+                    </button>
+                    <button
+                      (click)="activeScolariteTab.set('universitaire')"
+                      [class.border-blue-600]="
+                        activeScolariteTab() === 'universitaire'
+                      "
+                      [class.text-blue-600]="
+                        activeScolariteTab() === 'universitaire'
+                      "
+                      [class.border-transparent]="
+                        activeScolariteTab() !== 'universitaire'
+                      "
+                      [class.text-slate-500]="
+                        activeScolariteTab() !== 'universitaire'
+                      "
+                      class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors hover:text-blue-600 hover:bg-slate-100/50 rounded-t-lg"
+                    >
+                      Universitaire
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4">
+                <!-- TAB SECONDAIRE -->
+                <div
+                  *ngIf="activeScolariteTab() === 'secondaire'"
+                  class="flex flex-col gap-2"
+                >
+                  <!-- Année scolaire -->
+                  <div>
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Année scolaire
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaAnneeScolaire()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Histoire -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Histoire
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaHistoire()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Langue -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Langue
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaLangue()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Mathématique -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <div class="flex justify-between items-center mb-2 px-3">
+                      <h4
+                        class="text-sm font-semibold text-slate-500 uppercase tracking-wider"
+                      >
+                        Mathématique
+                      </h4>
+                      <select
+                        [ngModel]="selectedProvince()"
+                        (ngModelChange)="selectedProvince.set($event)"
+                        class="px-2 py-1 border border-slate-300 bg-white rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-[150px] truncate cursor-pointer"
+                      >
+                        <option *ngFor="let p of PROVINCES" [value]="p.id">
+                          {{ p.name }}
+                        </option>
+                      </select>
+                    </div>
+                    <label
+                      *ngFor="let m of mathCoursesForProvince()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(m.id)"
+                        (change)="toggleManualCriterion(m.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ m.label }}</span
+                      >
+                    </label>
+                    <div
+                      *ngIf="mathCoursesForProvince().length === 0"
+                      class="text-sm text-slate-500 italic p-2"
+                    >
+                      Aucun cours de mathématiques défini pour cette province.
+                    </div>
+                  </div>
+
+                  <!-- Science -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Science
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaScience()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Informatique -->
+                  <div class="mt-2 pt-3 border-t border-slate-100">
+                    <h4
+                      class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                    >
+                      Informatique
+                    </h4>
+                    <label
+                      *ngFor="let crit of criteriaInformatique()"
+                      class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCriteriaIds().has(crit.id)"
+                        (change)="toggleManualCriterion(crit.id)"
+                        class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                        >{{ crit.label }}</span
+                      >
+                    </label>
+                  </div>
+                </div>
+
+                <!-- TAB COURS SPÉCIALISÉS -->
+                <div
+                  *ngIf="activeScolariteTab() === 'specialises'"
+                  class="flex flex-col gap-2"
+                >
+                  <h4
+                    class="text-sm font-semibold text-slate-500 mb-2 px-3 uppercase tracking-wider"
+                  >
+                    Cours post-secondaire (non universitaire)
+                  </h4>
+                  <label
+                    *ngFor="let crit of criteriaCoursSpecialise()"
+                    class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="selectedCriteriaIds().has(crit.id)"
+                      (change)="toggleManualCriterion(crit.id)"
+                      class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span
+                      class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                      >{{ crit.label }}</span
+                    >
+                  </label>
+                  <div
+                    *ngIf="criteriaCoursSpecialise().length === 0"
+                    class="text-sm text-slate-500 italic p-2"
+                  >
+                    Aucun critère défini.
+                  </div>
+                </div>
+
+                <!-- TAB UNIVERSITAIRE -->
+                <div
+                  *ngIf="activeScolariteTab() === 'universitaire'"
+                  class="flex flex-col gap-2"
+                >
+                  <!-- Premier cycle -->
+                  <div>
+                    <label
+                      class="flex items-center gap-2 px-3 mb-2 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="
+                          selectedCriteriaIds().has('univ_1er_cycle_global')
+                        "
+                        (change)="
+                          toggleManualCriterion('univ_1er_cycle_global')
+                        "
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <h4
+                        class="text-sm font-semibold text-slate-500 uppercase tracking-wider group-hover:text-slate-700"
+                      >
+                        Étude de premier cycle
+                      </h4>
+                    </label>
+
+                    <div class="ml-2 mb-2 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('genie')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="expandedDomaines().has('genie')"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has('univ_1er_cycle_genie')
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_1er_cycle_genie')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Domaine du Génie
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('genie')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaire1erCycleGenie()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="ml-2 mb-2 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('sciences')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="
+                              expandedDomaines().has('sciences')
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has(
+                                'univ_1er_cycle_sciences'
+                              )
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_1er_cycle_sciences')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Domaine des Sciences
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('sciences')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaire1erCycleSciences()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="ml-2 mb-2 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('arts')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="expandedDomaines().has('arts')"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has('univ_1er_cycle_arts')
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_1er_cycle_arts')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Domaine des Arts
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('arts')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaire1erCycleArts()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="ml-2 mb-4 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('sante')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="expandedDomaines().has('sante')"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has('univ_1er_cycle_sante')
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_1er_cycle_sante')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Domaine de la Santé
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('sante')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaire1erCycleSante()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div
+                      *ngIf="criteriaUniversitaire1erCycle().length === 0"
+                      class="text-sm text-slate-500 italic p-3 text-center border border-dashed border-slate-200 rounded-lg"
+                    >
+                      Aucun critère défini pour le moment.
+                    </div>
+                  </div>
+
+                  <!-- Cycle supérieur -->
+                  <div class="mt-4 pt-4 border-t border-slate-100">
+                    <label
+                      class="flex items-center gap-2 px-3 mb-2 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="
+                          selectedCriteriaIds().has('univ_cycle_sup_global')
+                        "
+                        (change)="
+                          toggleManualCriterion('univ_cycle_sup_global')
+                        "
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <h4
+                        class="text-sm font-semibold text-slate-500 uppercase tracking-wider group-hover:text-slate-700"
+                      >
+                        Étude de cycles supérieurs
+                      </h4>
+                    </label>
+
+                    <div class="ml-2 mb-2 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('maitrise')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="
+                              expandedDomaines().has('maitrise')
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has(
+                                'univ_cycle_sup_maitrise'
+                              )
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_cycle_sup_maitrise')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Maîtrise
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('maitrise')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaireCycleSuperieurMaitrise()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="ml-2 mb-4 border-t border-slate-100 pt-2">
+                      <div
+                        class="flex items-center gap-1 w-full px-1 py-1 group"
+                      >
+                        <button
+                          (click)="toggleDomaine('doctorat')"
+                          class="focus:outline-none flex-shrink-0"
+                        >
+                          <svg
+                            class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform"
+                            [class.rotate-90]="
+                              expandedDomaines().has('doctorat')
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </button>
+                        <label
+                          class="flex items-center gap-2 cursor-pointer flex-grow"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="
+                              selectedCriteriaIds().has(
+                                'univ_cycle_sup_doctorat'
+                              )
+                            "
+                            (change)="
+                              toggleManualCriterion('univ_cycle_sup_doctorat')
+                            "
+                            class="w-3.5 h-3.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <h5
+                            class="text-xs font-bold text-slate-500 uppercase tracking-wider group-hover:text-slate-700 transition-colors pt-0.5"
+                          >
+                            Doctorat
+                          </h5>
+                        </label>
+                      </div>
+                      <div
+                        *ngIf="expandedDomaines().has('doctorat')"
+                        class="mt-1 pl-4"
+                      >
+                        <label
+                          *ngFor="
+                            let crit of criteriaUniversitaireCycleSuperieurDoctorat()
+                          "
+                          class="flex items-start gap-3 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                        >
+                          <input
+                            type="checkbox"
+                            [checked]="selectedCriteriaIds().has(crit.id)"
+                            (change)="toggleManualCriterion(crit.id)"
+                            class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span
+                            class="text-sm text-slate-700 group-hover:text-slate-900 font-medium"
+                            >{{ crit.label }}</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div
+                      *ngIf="criteriaUniversitaireCycleSuperieur().length === 0"
+                      class="text-sm text-slate-500 italic p-3 text-center border border-dashed border-slate-200 rounded-lg"
+                    >
+                      Aucun critère défini pour le moment.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expérience -->
+            <div
+              class="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col flex-1"
+            >
+              <div class="bg-slate-50 border-b border-slate-200 shrink-0">
+                <div class="p-4 pb-0">
+                  <h3 class="text-lg font-bold text-slate-800 mb-3">
+                    Expérience
+                  </h3>
+                </div>
+              </div>
+              <div class="p-4">
+                <!-- Section Test supplémentaire si au moins un métier au dossier requiert un test -->
+                @if (hasAnyExtraTest()) {
+                  <div class="mb-4 p-3 bg-indigo-50/80 border border-indigo-200 rounded-xl space-y-2.5">
+                    <div class="flex items-center justify-between pb-1.5 border-b border-indigo-100">
+                      <div class="flex items-center gap-2">
+                        <span class="p-0.5 px-1.5 rounded bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                          Test
+                        </span>
+                        <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wide">
+                          Test supplémentaire
+                        </h4>
+                      </div>
+                      <span class="text-[11px] text-indigo-700 font-medium">
+                        Cocher = Réussi
+                      </span>
+                    </div>
+
+                    <div class="space-y-2">
+                      <!-- Test ECE (00203) -->
+                      @if (hasEceJob()) {
+                        <div class="p-2.5 bg-white border border-indigo-100 rounded-lg shadow-2xs">
+                          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              [checked]="testEcePassed()"
+                              (change)="testEcePassed.set($any($event.target).checked)"
+                              class="mt-0.5 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <div class="flex-1">
+                              <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800">ECE</span>
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [class.bg-emerald-100]="testEcePassed()" [class.text-emerald-800]="testEcePassed()" [class.bg-slate-100]="!testEcePassed()" [class.text-slate-600]="!testEcePassed()">
+                                  {{ testEcePassed() ? "Réussi (Admissible)" : "Non coché (Inadmissible)" }}
+                                </span>
+                              </div>
+                              <p class="text-[11px] text-slate-500 mt-0.5">
+                                Évaluation des compétences en communication écrite (00203 - Officier des affaires publiques)
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      }
+
+                      <!-- Test ESOM (00207) -->
+                      @if (hasEsomJob()) {
+                        <div class="p-2.5 bg-white border border-indigo-100 rounded-lg shadow-2xs">
+                          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              [checked]="testEsomPassed()"
+                              (change)="testEsomPassed.set($any($event.target).checked)"
+                              class="mt-0.5 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <div class="flex-1">
+                              <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800">ESOM</span>
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [class.bg-emerald-100]="testEsomPassed()" [class.text-emerald-800]="testEsomPassed()" [class.bg-slate-100]="!testEsomPassed()" [class.text-slate-600]="!testEsomPassed()">
+                                  {{ testEsomPassed() ? "Réussi (Admissible)" : "Non coché (Inadmissible)" }}
+                                </span>
+                              </div>
+                              <p class="text-[11px] text-slate-500 mt-0.5">
+                                Évaluation de sélection des officiers de marine (00207 - Officier de guerre navale)
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      }
+
+                      <!-- Test CEOPM (00214) -->
+                      @if (hasCeopmJob()) {
+                        <div class="p-2.5 bg-white border border-indigo-100 rounded-lg shadow-2xs">
+                          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              [checked]="testCeopmPassed()"
+                              (change)="testCeopmPassed.set($any($event.target).checked)"
+                              class="mt-0.5 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <div class="flex-1">
+                              <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800">CEOPM</span>
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [class.bg-emerald-100]="testCeopmPassed()" [class.text-emerald-800]="testCeopmPassed()" [class.bg-slate-100]="!testCeopmPassed()" [class.text-slate-600]="!testCeopmPassed()">
+                                  {{ testCeopmPassed() ? "Réussi (Admissible)" : "Non coché (Inadmissible)" }}
+                                </span>
+                              </div>
+                              <p class="text-[11px] text-slate-500 mt-0.5">
+                                Centre d’évaluation des officiers de la police militaire (00214 - Officier de la police militaire)
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      }
+
+                      <!-- Test CSPN (00182, 00183, 00184) -->
+                      @if (hasCspnJob()) {
+                        <div class="p-2.5 bg-white border border-indigo-100 rounded-lg shadow-2xs space-y-2">
+                          <div class="flex flex-wrap items-start justify-between gap-2">
+                            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                [checked]="testCspnPassed()"
+                                (change)="onCspnMainToggle($any($event.target).checked)"
+                                class="mt-0.5 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                              />
+                              <div>
+                                <div class="flex items-center gap-2">
+                                  <span class="text-xs font-bold text-slate-800">CSPN</span>
+                                  <span
+                                    class="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+                                    [class.bg-emerald-100]="testCspnPassed()"
+                                    [class.text-emerald-800]="testCspnPassed()"
+                                    [class.bg-amber-100]="testCspnNotCompleted()"
+                                    [class.text-amber-800]="testCspnNotCompleted()"
+                                    [class.bg-slate-100]="!testCspnPassed() && !testCspnNotCompleted()"
+                                    [class.text-slate-600]="!testCspnPassed() && !testCspnNotCompleted()"
+                                  >
+                                    {{ testCspnPassed() ? "Test réussi" : (testCspnNotCompleted() ? "Pas encore complété (Inadmissible)" : "Non coché (Inadmissible)") }}
+                                  </span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5">
+                                  Centre de sélection du personnel navigant (00182, 00183, 00184)
+                                </p>
+                              </div>
+                            </label>
+
+                            <label class="inline-flex items-center gap-1.5 px-2 py-1 bg-amber-50/90 border border-amber-200 rounded-md cursor-pointer hover:bg-amber-100/80 select-none transition-colors">
+                              <input
+                                type="checkbox"
+                                [checked]="testCspnNotCompleted()"
+                                (change)="onCspnNotCompletedToggle($any($event.target).checked)"
+                                class="w-3.5 h-3.5 text-amber-600 border-amber-300 rounded focus:ring-amber-500 cursor-pointer"
+                              />
+                              <span class="text-xs font-medium text-amber-900">Pas encore complété</span>
+                            </label>
+                          </div>
+
+                          @if (testCspnPassed()) {
+                            <div class="mt-2 pl-6 pt-2 border-t border-slate-100 space-y-1.5">
+                              <p class="text-[11px] font-semibold text-slate-700 mb-1">
+                                Métiers pour lesquels le test est réussi :
+                              </p>
+                              <div class="grid grid-cols-1 gap-1.5">
+                                <label class="flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-50 cursor-pointer border border-slate-100 select-none">
+                                  <input
+                                    type="checkbox"
+                                    [checked]="testCspn00182Passed()"
+                                    (change)="testCspn00182Passed.set($any($event.target).checked)"
+                                    class="w-3.5 h-3.5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                                  />
+                                  <span class="text-xs text-slate-800">
+                                    <span class="font-bold text-indigo-700">00182</span> - SYSTÈMES DE COMBAT
+                                  </span>
+                                </label>
+
+                                <label class="flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-50 cursor-pointer border border-slate-100 select-none">
+                                  <input
+                                    type="checkbox"
+                                    [checked]="testCspn00183Passed()"
+                                    (change)="testCspn00183Passed.set($any($event.target).checked)"
+                                    class="w-3.5 h-3.5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                                  />
+                                  <span class="text-xs text-slate-800">
+                                    <span class="font-bold text-indigo-700">00183</span> - PILOTE
+                                  </span>
+                                </label>
+
+                                <label class="flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-50 cursor-pointer border border-slate-100 select-none">
+                                  <input
+                                    type="checkbox"
+                                    [checked]="testCspn00184Passed()"
+                                    (change)="testCspn00184Passed.set($any($event.target).checked)"
+                                    class="w-3.5 h-3.5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                                  />
+                                  <span class="text-xs text-slate-800">
+                                    <span class="font-bold text-indigo-700">00184</span> - CONTRÔLE AÉROSPATIAL
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <div class="flex flex-col gap-2">
+                  <label
+                    *ngFor="let crit of criteriaExperience()"
+                    class="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 group"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="selectedCriteriaIds().has(crit.id)"
+                      (change)="toggleManualCriterion(crit.id)"
+                      class="mt-0.5 flex-shrink-0 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span
+                      class="text-sm text-slate-700 group-hover:text-slate-900 font-medium whitespace-pre-line"
+                      >{{ crit.label }}</span
+                    >
+                  </label>
+                  <div
+                    *ngIf="criteriaExperience().length === 0"
+                    class="text-sm text-slate-500 italic p-3 text-center border border-dashed border-slate-200 rounded-lg"
+                  >
+                    Aucune expérience définie.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          } @else {
+            <!-- Volet PFOR lorsque Postulant PFOR est activé -->
+            <div class="p-5 bg-white border border-indigo-200 rounded-xl shadow-sm flex flex-col gap-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                  <span class="bg-indigo-600 text-white text-xs font-black px-2 py-0.5 rounded tracking-wider leading-none">PFOR</span>
+                  <h3 class="text-sm font-bold text-slate-800">
+                    Configuration du Postulant PFOR
+                  </h3>
+                </div>
+              </div>
+
+              <!-- Type de PFOR -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-2">
+                  Volet PFOR sélectionné
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    (click)="pforType.set('cmr')"
+                    class="p-3 rounded-xl border text-left flex flex-col gap-1 transition-all cursor-pointer"
+                    [class.bg-indigo-50]="pforType() === 'cmr'"
+                    [class.border-indigo-400]="pforType() === 'cmr'"
+                    [class.text-indigo-950]="pforType() === 'cmr'"
+                    [class.bg-white]="pforType() !== 'cmr'"
+                    [class.border-slate-200]="pforType() !== 'cmr'"
+                    [class.text-slate-700]="pforType() !== 'cmr'"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-sm">PFOR CMR</span>
+                      @if (pforType() === 'cmr') {
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                      }
+                    </div>
+                    <span class="text-xs text-slate-500">Collège militaire royal du Canada (Kingston / Saint-Jean)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    (click)="pforType.set('civil')"
+                    class="p-3 rounded-xl border text-left flex flex-col gap-1 transition-all cursor-pointer"
+                    [class.bg-indigo-50]="pforType() === 'civil'"
+                    [class.border-indigo-400]="pforType() === 'civil'"
+                    [class.text-indigo-950]="pforType() === 'civil'"
+                    [class.bg-white]="pforType() !== 'civil'"
+                    [class.border-slate-200]="pforType() !== 'civil'"
+                    [class.text-slate-700]="pforType() !== 'civil'"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-sm">PFOR Civil</span>
+                      @if (pforType() === 'civil') {
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                      }
+                    </div>
+                    <span class="text-xs text-slate-500">Universités civiles canadiennes subventionnées</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Domaines CMR -->
+              @if (pforType() === 'cmr') {
+                <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                  <label class="block text-xs font-bold text-slate-700">
+                    Domaines d'études admis au CMR (cochez les domaines rencontrés) :
+                  </label>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label
+                      class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer select-none transition-all"
+                      [class.bg-indigo-50]="cmrArts()"
+                      [class.border-indigo-300]="cmrArts()"
+                      [class.text-indigo-950]="cmrArts()"
+                      [class.bg-white]="!cmrArts()"
+                      [class.border-slate-200]="!cmrArts()"
+                      [class.text-slate-700]="!cmrArts()"
+                    >
+                      <input
+                        type="checkbox"
+                        class="peer h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none transition-all cursor-pointer"
+                        [checked]="cmrArts()"
+                        (change)="cmrArts.set(!cmrArts())"
+                      />
+                      <span class="relative flex items-center font-bold text-sm">
+                        <svg
+                          class="absolute -left-[1.25rem] w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Arts
+                      </span>
+                    </label>
+
+                    <label
+                      class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer select-none transition-all"
+                      [class.bg-indigo-50]="cmrScience()"
+                      [class.border-indigo-300]="cmrScience()"
+                      [class.text-indigo-950]="cmrScience()"
+                      [class.bg-white]="!cmrScience()"
+                      [class.border-slate-200]="!cmrScience()"
+                      [class.text-slate-700]="!cmrScience()"
+                    >
+                      <input
+                        type="checkbox"
+                        class="peer h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none transition-all cursor-pointer"
+                        [checked]="cmrScience()"
+                        (change)="cmrScience.set(!cmrScience())"
+                      />
+                      <span class="relative flex items-center font-bold text-sm">
+                        <svg
+                          class="absolute -left-[1.25rem] w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Sciences
+                      </span>
+                    </label>
+
+                    <label
+                      class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer select-none transition-all"
+                      [class.bg-indigo-50]="cmrGenie()"
+                      [class.border-indigo-300]="cmrGenie()"
+                      [class.text-indigo-950]="cmrGenie()"
+                      [class.bg-white]="!cmrGenie()"
+                      [class.border-slate-200]="!cmrGenie()"
+                      [class.text-slate-700]="!cmrGenie()"
+                    >
+                      <input
+                        type="checkbox"
+                        class="peer h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none transition-all cursor-pointer"
+                        [checked]="cmrGenie()"
+                        (change)="cmrGenie.set(!cmrGenie())"
+                      />
+                      <span class="relative flex items-center font-bold text-sm">
+                        <svg
+                          class="absolute -left-[1.25rem] w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Génie
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Colonne de droite: Résultat -->
+        <div
+          class="flex flex-col lg:w-5/12 lg:sticky lg:top-4 h-fit gap-4 pr-1"
+          *ngIf="showResultsPanel()"
+        >
+          <!-- Panneau de la note de registre -->
+          <div
+            class="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col overflow-hidden shrink-0"
+          >
+            <div
+              class="p-4 bg-slate-50 border-b border-slate-200 shrink-0 flex items-center justify-between flex-wrap gap-2"
+            >
+              <div class="flex items-center gap-2">
+                <span class="p-1 px-2 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold font-sans uppercase tracking-wider">
+                  Registre
+                </span>
+                <h3 class="text-sm font-bold text-slate-800">
+                  Note du registre / dossier
+                </h3>
+              </div>
+
+              <div>
+                <button
+                  (click)="copyNoteRegistry()"
+                  class="px-3 py-1.5 text-white rounded-lg transition flex items-center gap-1.5 text-xs font-medium cursor-pointer"
+                  [class.bg-emerald-600]="noteCopied()"
+                  [class.hover:bg-emerald-700]="noteCopied()"
+                  [class.bg-slate-600]="!noteCopied()"
+                  [class.hover:bg-slate-700]="!noteCopied()"
+                >
+                  @if (noteCopied()) {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="animate-bounce"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Note copiée !
+                  } @else {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect
+                        x="9"
+                        y="9"
+                        width="13"
+                        height="13"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path
+                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                      ></path>
+                    </svg>
+                    Copier la note
+                  }
+                </button>
+              </div>
+            </div>
+            <div class="p-4 bg-slate-50/30">
+              <div class="bg-white border border-slate-200 rounded-lg p-3 text-xs text-slate-700 font-mono select-text leading-relaxed whitespace-pre-wrap break-words">
+                {{ generateNoteRegistry() }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Panneau du courriel -->
+          <div
+            class="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col overflow-hidden shrink-0"
+          >
+            <div
+              class="p-4 bg-slate-50 border-b border-slate-200 shrink-0 flex items-center justify-between flex-wrap gap-2"
+            >
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-sm font-bold text-slate-800">
+                  {{ (citizenship() === 'PR < 3 years') ? 'Courriel - Résident permanent inadmissible (Dossier fermé)' : (age() !== null && age()! >= 57) ? 'Courriel - Âge maximal dépassé (Dossier fermé)' : 'Courriel de réorientation' }}
+                </h3>
+                @if (citizenship() === 'PR < 3 years') {
+                  <span
+                    class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200"
+                  >
+                    Inadmissible (RP &lt; 3 ans)
+                  </span>
+                } @else if (age() !== null && age()! >= 57) {
+                  <span
+                    class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200"
+                  >
+                    Inadmissible (57+)
+                  </span>
+                } @else {
+                  <div class="flex gap-2" *ngIf="eligibleJobs().length > 0">
+                    <span
+                      class="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full"
+                    >
+                      {{ eligibleJobs().length }} métier(s)
+                    </span>
+                  </div>
+                  <div class="flex gap-2" *ngIf="isPforApplicant() && eligibleJobs().length === 0">
+                    <span
+                      class="text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full"
+                    >
+                      0 métier PFOR ouvert
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <div class="flex gap-2 w-full sm:w-auto">
+                <button
+                  (click)="exportToOutlook()"
+                  [disabled]="!showResultsPanel()"
+                  class="flex-1 sm:flex-none justify-center px-3 py-1.5 text-white rounded-lg transition flex items-center gap-1.5 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  [class.bg-emerald-600]="copied()"
+                  [class.hover:bg-emerald-700]="copied()"
+                  [class.bg-blue-600]="!copied()"
+                  [class.hover:bg-blue-700]="!copied()"
+                  title="Exporter vers Outlook"
+                >
+                  @if (copied()) {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="animate-bounce"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Copié ! Ouverture d'Outlook...
+                  } @else {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
+                      ></path>
+                      <polyline points="14 4 20 4 20 10"></polyline>
+                      <line x1="14" y1="10" x2="20" y2="4"></line>
+                    </svg>
+                    Exporter vers Outlook
+                  }
+                </button>
+              </div>
+            </div>
+            <div class="p-4 bg-white">
+              <div
+                class="prose prose-slate prose-sm max-w-none text-xs leading-relaxed"
+                [innerHTML]="getReoContentHtmlFr()"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+})
